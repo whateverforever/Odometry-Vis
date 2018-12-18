@@ -14,7 +14,17 @@ add_definitions(${NANOGUI_EXTRA_DEFS})
 find_package(OpenCV REQUIRED)
 include_directories(${OPENCV_INCLUDE_DIR})
 
+# VTK
+find_package(VTK REQUIRED)
+include(${VTK_USE_FILE})
+
 add_library(Visualization library.cpp library.h)
 add_executable(${APP_EXE} main.cpp main.h)
 
 target_link_libraries(${APP_EXE} Visualization nanogui opencv_core opencv_highgui opencv_features2d opencv_imgcodecs)
+
+if(VTK_LIBRARIES)
+    target_link_libraries(${APP_EXE} ${VTK_LIBRARIES})
+else()
+    target_link_libraries(${APP_EXE} vtkHybrid vtkWidgets)
+endif()
