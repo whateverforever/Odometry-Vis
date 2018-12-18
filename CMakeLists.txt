@@ -4,12 +4,17 @@ project(Visualization)
 set(CMAKE_CXX_STANDARD 14)
 set(APP_EXE main)
 
+# Nanogui
 add_subdirectory(nanogui)
 include_directories(nanogui/include)
 include_directories(${NANOGUI_EXTRA_INCS})
 add_definitions(${NANOGUI_EXTRA_DEFS})
 
+# OpenCV
+find_package(OpenCV REQUIRED)
+include_directories(${OPENCV_INCLUDE_DIR})
+
 add_library(Visualization library.cpp library.h)
 add_executable(${APP_EXE} main.cpp main.h)
 
-target_link_libraries(${APP_EXE} Visualization nanogui)
+target_link_libraries(${APP_EXE} Visualization nanogui opencv_core opencv_highgui opencv_features2d opencv_imgcodecs)
