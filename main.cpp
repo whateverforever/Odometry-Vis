@@ -9,6 +9,8 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
+#include <stdlib.h>
+
 #include <nanogui/nanogui.h>
 #include <iostream>
 #include <opencv2/core/core.hpp>
@@ -62,11 +64,15 @@ int main(int /* argc */, char ** /* argv */) {
     glGenTextures(1, &imageTexId);
     glBindTexture(GL_TEXTURE_2D, imageTexId);
 
-    float pixels[] = {
-            0.0f, 0.0f, 0.0f,   1.0f, 1.0f, 1.0f,
-            1.0f, 1.0f, 1.0f,   0.0f, 0.0f, 0.0f
-    };
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_FLOAT, pixels);
+    int width = 48;
+    int height = 48;
+
+    float pixels[3*width*height];
+    for (int i = 0; i < 3*width*height; i++) {
+        pixels[i] = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+    }
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_FLOAT, pixels);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -74,6 +80,7 @@ int main(int /* argc */, char ** /* argv */) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
     auto imageView = new ImageView(imageWindow, imageTexId);
+    imageView->setPosition(Vector2i(50,50));
     imageView->setGridThreshold(20);
     imageView->setPixelInfoThreshold(20);
     imageView->fit();
