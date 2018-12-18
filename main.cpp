@@ -57,7 +57,7 @@ int main(int /* argc */, char ** /* argv */) {
     Screen *screen = new Screen(Vector2i(500, 700), "NanoGUI test");
 
     auto imageWindow = new Window(screen, "Selected image");
-    imageWindow->setPosition(Vector2i(0, 0));
+    imageWindow->setPosition({50, 50});
     imageWindow->setLayout(new GroupLayout());
 
     GLuint imageTexId;
@@ -86,6 +86,7 @@ int main(int /* argc */, char ** /* argv */) {
 
     screen->drawAll();
     screen->setVisible(true);
+    imageWindow->center();
 
     nanogui::mainloop();
     nanogui::shutdown();
