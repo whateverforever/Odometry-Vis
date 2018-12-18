@@ -35,12 +35,12 @@ std::string strval = "A string";
 test_enum enumval = Item2;
 Color colval(0.5f, 0.5f, 0.7f, 1.f);
 
-int getTextureForPixels(float pixels[], int width, int height) {
+int getTextureForMat(cv::Mat &mat) {
     GLuint imageTexId;
     glGenTextures(1, &imageTexId);
     glBindTexture(GL_TEXTURE_2D, imageTexId);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_FLOAT, pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mat.cols, mat.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, mat.ptr());
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -75,15 +75,7 @@ int main(int /* argc */, char ** /* argv */) {
     imageWindow->setPosition({50, 50});
     imageWindow->setLayout(new GroupLayout());
 
-    int width = 48;
-    int height = 48;
-
-    float pixels[3*width*height];
-    for (int i = 0; i < 3*width*height; i++) {
-        pixels[i] = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-    }
-
-    int imageTexId = getTextureForPixels(pixels, width, height);
+    int imageTexId = getTextureForMat(image);
 
     auto imageView = new ImageView(imageWindow, imageTexId);
     imageView->setSize({100,100});
