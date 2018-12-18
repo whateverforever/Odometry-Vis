@@ -83,6 +83,7 @@ int main(int /* argc */, char ** /* argv */) {
     imageView->setPosition(Vector2i(50,50));
     imageView->setGridThreshold(20);
     imageView->setPixelInfoThreshold(20);
+    imageView->setSize({800,800});
     imageView->fit();
 
     screen->drawAll();
