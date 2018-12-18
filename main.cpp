@@ -8,32 +8,17 @@
     All rights reserved. Use of this source code is governed by a
     BSD-style license that can be found in the LICENSE.txt file.
 */
-
+#include <iostream>
 #include <stdlib.h>
 
 #include <nanogui/nanogui.h>
-#include <iostream>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-
 #include <nanogui/imagepanel.h>
 #include <nanogui/imageview.h>
 
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
 using namespace nanogui;
-
-enum test_enum {
-    Item1 = 0,
-    Item2,
-    Item3
-};
-
-bool bvar = true;
-int ivar = 12345678;
-double dvar = 3.1415926;
-float fvar = (float)dvar;
-std::string strval = "A string";
-test_enum enumval = Item2;
-Color colval(0.5f, 0.5f, 0.7f, 1.f);
 
 GLuint getTextureForMat(cv::Mat &mat) {
     GLuint imageTexId;
