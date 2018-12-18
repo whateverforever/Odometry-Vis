@@ -8,6 +8,8 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+#include <vtkSmartPointer.h>
+
 using namespace nanogui;
 
 GLuint getTextureForMat(cv::Mat &mat) {
