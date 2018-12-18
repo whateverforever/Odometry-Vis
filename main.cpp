@@ -3,7 +3,11 @@
 //
 
 #include "main.h"
+#include "library.h"
 
 int main() {
+
+    hello();
+
     return 0;
 }
