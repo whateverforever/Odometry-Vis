@@ -35,7 +35,7 @@ std::string strval = "A string";
 test_enum enumval = Item2;
 Color colval(0.5f, 0.5f, 0.7f, 1.f);
 
-int getTextureForMat(cv::Mat &mat) {
+GLuint getTextureForMat(cv::Mat &mat) {
     GLuint imageTexId;
     glGenTextures(1, &imageTexId);
     glBindTexture(GL_TEXTURE_2D, imageTexId);
@@ -62,29 +62,26 @@ int main(int /* argc */, char ** /* argv */) {
         return -1;
     }
 
-    namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
-    imshow( "Display window", image );                   // Show our image inside it.
-
-    cv::waitKey(0);
-
     // Second, display the image using nano
     nanogui::init();
-    Screen *screen = new Screen(Vector2i(500, 700), "NanoGUI test");
+    Screen *screen = new Screen({1000, 750}, "NanoGUI test");
+    screen->setLayout(new BoxLayout(Orientation::Horizontal, Alignment::Middle, 10, 10));
 
     auto imageWindow = new Window(screen, "RGB Left");
-    imageWindow->setPosition({50, 50});
-    imageWindow->setLayout(new GroupLayout());
+    imageWindow->setLayout(new BoxLayout(Orientation::Horizontal));
 
-    int imageTexId = getTextureForMat(image);
+    GLuint imageTexId = getTextureForMat(image);
 
     auto imageView = new ImageView(imageWindow, imageTexId);
-    imageView->setSize({100,100});
-    imageView->setScaleCentered(1);
-    imageView->fit();
+    imageView->setSize({600,400});
 
+    // To test layouting...
+    auto imageWindow2 = new Window(screen, "RGB Right");
+    imageWindow2->setSize({200,400});
+
+    screen->performLayout();
     screen->drawAll();
     screen->setVisible(true);
-    imageWindow->center();
 
     nanogui::mainloop();
     nanogui::shutdown();
