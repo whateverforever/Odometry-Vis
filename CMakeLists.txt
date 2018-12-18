@@ -6,3 +6,5 @@ set(CMAKE_CXX_STANDARD 14)
 add_library(Visualization library.cpp library.h)
 
 add_executable(main main.cpp main.h)
+
+target_link_libraries(main Visualization)
