@@ -73,7 +73,7 @@ int main(int /* argc */, char ** /* argv */) {
     GLuint imageTexId = getTextureForMat(image);
 
     auto imageView = new ImageView(imageWindow, imageTexId);
-    imageView->setSize({600,400});
+    imageView->setFixedSize({300,200});
 
     // To test layouting...
     auto imageWindow2 = new Window(screen, "RGB Right");
