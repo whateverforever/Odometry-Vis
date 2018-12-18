@@ -36,19 +36,19 @@ Color colval(0.5f, 0.5f, 0.7f, 1.f);
 int main(int /* argc */, char ** /* argv */) {
 
     // First, load an image with openCV and do stuff with it
-    cv::Mat image;
-    image = cv::imread("./data/rgbd_dataset_freiburg3_teddy/rgb/1341841873.273798.png", CV_LOAD_IMAGE_COLOR);   // Read the file
-
-    if(! image.data )                              // Check for invalid input
-    {
-        std::cout <<  "Could not open or find the image" << std::endl ;
-        return -1;
-    }
-
-    namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
-    imshow( "Display window", image );                   // Show our image inside it.
-
-    cv::waitKey(0);
+//    cv::Mat image;
+//    image = cv::imread("./data/rgbd_dataset_freiburg3_teddy/rgb/1341841873.273798.png", CV_LOAD_IMAGE_COLOR);   // Read the file
+//
+//    if(! image.data )                              // Check for invalid input
+//    {
+//        std::cout <<  "Could not open or find the image" << std::endl ;
+//        return -1;
+//    }
+//
+//    namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
+//    imshow( "Display window", image );                   // Show our image inside it.
+//
+//    cv::waitKey(0);
 
     // Second, display the image using nano
     nanogui::init();
@@ -62,18 +62,21 @@ int main(int /* argc */, char ** /* argv */) {
     glGenTextures(1, &imageTexId);
     glBindTexture(GL_TEXTURE_2D, imageTexId);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
     float pixels[] = {
             0.0f, 0.0f, 0.0f,   1.0f, 1.0f, 1.0f,
             1.0f, 1.0f, 1.0f,   0.0f, 0.0f, 0.0f
     };
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_FLOAT, pixels);
 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
     auto imageView = new ImageView(imageWindow, imageTexId);
     imageView->setGridThreshold(20);
     imageView->setPixelInfoThreshold(20);
+    imageView->fit();
 
     screen->drawAll();
     screen->setVisible(true);
