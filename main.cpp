@@ -80,10 +80,8 @@ int main(int /* argc */, char ** /* argv */) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
     auto imageView = new ImageView(imageWindow, imageTexId);
-    imageView->setPosition(Vector2i(50,50));
-    imageView->setGridThreshold(20);
-    imageView->setPixelInfoThreshold(20);
-    imageView->setSize({800,800});
+    imageView->setSize({100,100});
+    imageView->setScaleCentered(1);
     imageView->fit();
 
     screen->drawAll();
