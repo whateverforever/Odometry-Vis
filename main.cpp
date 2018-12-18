@@ -11,6 +11,8 @@
 
 #include <nanogui/nanogui.h>
 #include <iostream>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 using namespace nanogui;
 
@@ -29,6 +31,23 @@ test_enum enumval = Item2;
 Color colval(0.5f, 0.5f, 0.7f, 1.f);
 
 int main(int /* argc */, char ** /* argv */) {
+
+    cv::Mat image;
+    image = cv::imread("./data/rgbd_dataset_freiburg3_teddy/rgb/1341841873.273798.png", CV_LOAD_IMAGE_COLOR);   // Read the file
+
+    if(! image.data )                              // Check for invalid input
+    {
+        std::cout <<  "Could not open or find the image" << std::endl ;
+        return -1;
+    }
+
+    namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
+    imshow( "Display window", image );                   // Show our image inside it.
+
+    cv::waitKey(0);
+
+    return 0;
+
     nanogui::init();
 
     /* scoped variables */ {
