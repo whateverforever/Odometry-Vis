@@ -30,8 +30,9 @@ GLuint getTextureForMat(cv::Mat &mat) {
 int main(int /* argc */, char ** /* argv */) {
 
     // First, load an image with openCV and do stuff with it
-    cv::Mat image;
+    cv::Mat image, image_2;
     image = cv::imread("./data/rgbd_dataset_freiburg3_teddy/rgb/1341841873.273798.png", CV_LOAD_IMAGE_COLOR);   // Read the file
+    image_2 = cv::imread("./data/rgbd_dataset_freiburg3_teddy/rgb/1341841879.367159.png", CV_LOAD_IMAGE_COLOR);   // Read the file
 
     if(! image.data )                              // Check for invalid input
     {
@@ -45,12 +46,17 @@ int main(int /* argc */, char ** /* argv */) {
     screen->setLayout(new BoxLayout(Orientation::Horizontal, Alignment::Middle, 10, 10));
 
     auto imageWindow = new Window(screen, "RGB Left");
-    imageWindow->setLayout(new BoxLayout(Orientation::Horizontal));
+    imageWindow->setLayout(new BoxLayout(Orientation::Vertical));
 
     GLuint imageTexId = getTextureForMat(image);
 
     auto imageView = new ImageView(imageWindow, imageTexId);
     imageView->setFixedSize({300,200});
+
+    auto loadNewImgBtn = new Button(imageWindow, "Load new frame");
+    loadNewImgBtn->setCallback([image_2]() {
+        glTexSubImage2D(GL_TEXTURE_2D, 0,0,0, image_2.cols, image_2.rows, GL_BGR, GL_UNSIGNED_BYTE, image_2.ptr());
+    });
 
     // To test layouting...
     auto imageWindow2 = new Window(screen, "RGB Right");
@@ -59,7 +65,7 @@ int main(int /* argc */, char ** /* argv */) {
     screen->performLayout();
     screen->drawAll();
     screen->setVisible(true);
-
+    // blitframebuffer
     nanogui::mainloop();
     nanogui::shutdown();
 
