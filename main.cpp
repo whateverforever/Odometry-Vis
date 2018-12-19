@@ -46,7 +46,7 @@ int main(int /* argc */, char ** /* argv */) {
     screen->setLayout(new BoxLayout(Orientation::Horizontal, Alignment::Middle, 10, 10));
 
     auto imageWindow = new Window(screen, "RGB Left");
-    imageWindow->setLayout(new BoxLayout(Orientation::Vertical));
+    imageWindow->setLayout(new BoxLayout(Orientation::Vertical, Alignment::Middle, 5, 5));
 
     GLuint imageTexId = getTextureForMat(image);
 
