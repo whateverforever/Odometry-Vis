@@ -54,7 +54,8 @@ int main(int /* argc */, char ** /* argv */) {
     imageView->setFixedSize({300,200});
 
     auto loadNewImgBtn = new Button(imageWindow, "Load new frame");
-    loadNewImgBtn->setCallback([image_2]() {
+    loadNewImgBtn->setCallback([imageTexId, image_2]() {
+        glBindTexture(GL_TEXTURE_2D, imageTexId);
         glTexSubImage2D(GL_TEXTURE_2D, 0,0,0, image_2.cols, image_2.rows, GL_BGR, GL_UNSIGNED_BYTE, image_2.ptr());
     });
 
