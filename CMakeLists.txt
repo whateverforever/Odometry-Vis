@@ -15,7 +15,7 @@ find_package(OpenCV REQUIRED)
 include_directories(${OPENCV_INCLUDE_DIR})
 
 # VTK
-find_package(VTK REQUIRED)
+find_package(VTK 8.1.2 REQUIRED)
 include(${VTK_USE_FILE})
 
 add_library(Visualization library.cpp library.h)
