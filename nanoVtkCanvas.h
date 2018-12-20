@@ -26,8 +26,9 @@
 class NanoVtkCanvas : public nanogui::GLCanvas {
 public:
     NanoVtkCanvas(Widget *parent) : nanogui::GLCanvas(parent) {
-        if (!initialized) {
+        if (!m_initialized) {
             vtkNew<vtkExternalOpenGLRenderWindow> renWin;
+
             externalVTKWidget->SetRenderWindow(renWin);
 
             vtkNew<vtkPolyDataMapper> mapper;
@@ -43,16 +44,22 @@ public:
             actor->RotateY(45.0);
             ren->ResetCamera();
 
-            initialized = true;
+            m_rawWindow = parent->screen()->glfwWindow();
+
+            m_initialized = true;
         }
     }
 
     virtual void drawGL() override {
-        glEnable(GL_DEPTH_TEST);
-        glDisable(GL_DEPTH_TEST);
+        //glEnable(GL_DEPTH_TEST);
+
+        externalVTKWidget->GetRenderWindow()->Render();
+
+        //glDisable(GL_DEPTH_TEST);
     }
 
 private:
-    bool initialized;
+    bool m_initialized;
+    GLFWwindow *m_rawWindow;
     vtkNew<ExternalVTKWidget> externalVTKWidget;
 };
