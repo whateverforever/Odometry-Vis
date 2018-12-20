@@ -10,6 +10,8 @@
 
 #include <vtkSmartPointer.h>
 
+#include "nanoVtkCanvas.h"
+
 using namespace nanogui;
 
 GLuint getTextureForMat(cv::Mat &mat) {
