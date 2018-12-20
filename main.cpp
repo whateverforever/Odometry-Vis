@@ -63,7 +63,11 @@ int main(int /* argc */, char ** /* argv */) {
 
     // To test layouting...
     auto imageWindow2 = new Window(screen, "RGB Right");
-    imageWindow2->setSize({200,400});
+    imageWindow2->setLayout(new BoxLayout(Orientation::Vertical, Alignment::Middle, 5, 5));
+
+    // Display vtk
+    auto vtkCanvas = new NanoVtkCanvas(imageWindow2);
+    vtkCanvas->setSize({400,400});
 
     screen->performLayout();
     screen->drawAll();

@@ -12,6 +12,7 @@
 #include <nanogui/glcanvas.h>
 
 class NanoVtkCanvas : public nanogui::GLCanvas {
+public:
     NanoVtkCanvas(Widget *parent) : nanogui::GLCanvas(parent) {
 
     }
