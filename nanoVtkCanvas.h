@@ -13,64 +13,9 @@
 #include <nanogui/opengl.h>
 #include <nanogui/glutil.h>
 
-
-#include <vtkPolyDataMapper.h>
-#include <vtkCommand.h>
-#include <ExternalVTKWidget.h>
-#include <vtkActor.h>
-#include <vtkCallbackCommand.h>
-#include <vtkCamera.h>
-#include <vtkCubeSource.h>
-#include <vtkExternalOpenGLRenderWindow.h>
-#include <vtkLight.h>
-#include <vtkNew.h>
-#include <vtkPolyDataMapper.h>
-
-#include <Eigen/Core>
-
-using Vector3f = Eigen::Vector3f;
-
 class NanoVtkCanvas : public nanogui::GLCanvas {
 public:
     NanoVtkCanvas(Widget *parent) : nanogui::GLCanvas(parent) {
-        if (!m_initialized) {
-            glClearColor(0.2,0.1,0.3,1);
-            glClear(GL_COLOR_BUFFER_BIT);
-
-            GLfloat vertices[] = {
-                -1.0f, -1.0f, 0.0f,
-                1.0f, -1.0f, 0.0f,
-                0.0f, 1.0f, 0.0f
-            };
-
-            glGenBuffers(1, &m_VBO);
-            glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-
-            vtkNew<vtkExternalOpenGLRenderWindow> renWin;
-
-            m_externalVTKWidget->SetRenderWindow(renWin);
-
-            vtkNew<vtkPolyDataMapper> mapper;
-            vtkNew<vtkActor> actor;
-            actor->SetMapper(mapper);
-
-            m_ren = m_externalVTKWidget->AddRenderer();
-            m_ren->AddActor(actor);
-
-            vtkNew<vtkCubeSource> cs;
-            mapper->SetInputConnection(cs->GetOutputPort());
-            actor->RotateX(45.0);
-            actor->RotateY(45.0);
-
-            m_ren->MakeCamera();
-            m_ren->ResetCamera();
-
-            m_rawWindow = parent->screen()->glfwWindow();
-            m_initialized = true;
-        }
-
         using namespace nanogui;
 
         mShader.init(
@@ -168,34 +113,9 @@ public:
         /* Draw 12 triangles starting at index 0 */
         mShader.drawIndexed(GL_TRIANGLES, 0, 12);
         glDisable(GL_DEPTH_TEST);
-
-        // m_externalVTKWidget->GetRenderWindow()->Start();
-        // m_externalVTKWidget->GetRenderWindow()->Render();
-        // return;
-
-        // // Vector3f vertices[3];
-        // // Vertices[0] = Vector3f(-1.0f, -1.0f, 0.0f);
-        // // Vertices[1] = Vector3f(1.0f, -1.0f, 0.0f);
-        // // Vertices[2] = Vector3f(0.0f, 1.0f, 0.0f);
-
-        // // glEnable(GL_DEPTH_TEST);
-
-        // glEnableVertexAttribArray(0);
-
-        // glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-        // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        // glDrawArrays(GL_TRIANGLES, 0, 3);
-        // glDisableVertexAttribArray(0);
-
-        // // glDisable(GL_DEPTH_TEST);
     }
 
 private:
     nanogui::GLShader mShader;
     Eigen::Vector3f mRotation;
-    bool m_initialized;
-    GLFWwindow *m_rawWindow;
-    vtkRenderer* m_ren;
-    GLuint m_VBO;
-    vtkNew<ExternalVTKWidget> m_externalVTKWidget;
 };
