@@ -3,19 +3,19 @@
 // Created by Max on 20.12.18.
 //
 
-#ifndef VISUALIZATION_NANOVTKCANVAS_H
-#define VISUALIZATION_NANOVTKCANVAS_H
+#ifndef VISUALIZATION_TRAJECTORYVIEW_H
+#define VISUALIZATION_TRAJECTORYVIEW_H
 
-#endif //VISUALIZATION_NANOVTKCANVAS_H
+#endif //VISUALIZATION_TRAJECTORYVIEW_H
 
 #include <nanogui/widget.h>
 #include <nanogui/glcanvas.h>
 #include <nanogui/opengl.h>
 #include <nanogui/glutil.h>
 
-class NanoVtkCanvas : public nanogui::GLCanvas {
+class TrajectoryView : public nanogui::GLCanvas {
 public:
-    NanoVtkCanvas(Widget *parent) : nanogui::GLCanvas(parent) {
+    TrajectoryView(Widget *parent) : nanogui::GLCanvas(parent) {
         using namespace nanogui;
 
         mShader.init(
@@ -91,7 +91,7 @@ public:
         mShader.uploadAttrib("color", colors);
     }
 
-    ~NanoVtkCanvas() {
+    ~TrajectoryView() {
         mShader.free();
     }
 

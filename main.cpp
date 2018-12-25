@@ -10,7 +10,7 @@
 
 #include <vtkSmartPointer.h>
 
-#include "nanoVtkCanvas.h"
+#include "trajectoryView.h"
 
 using namespace nanogui;
 
@@ -66,7 +66,7 @@ int main(int /* argc */, char ** /* argv */) {
     imageWindow2->setLayout(new BoxLayout(Orientation::Vertical, Alignment::Middle, 5, 5));
 
     // Display vtk
-    auto vtkCanvas = new NanoVtkCanvas(imageWindow2);
+    auto vtkCanvas = new TrajectoryView(imageWindow2);
     vtkCanvas->setSize({400,400});
 
     Button *b1 = new Button(imageWindow2, "Random Rotation");
