@@ -69,6 +69,13 @@ int main(int /* argc */, char ** /* argv */) {
     auto vtkCanvas = new NanoVtkCanvas(imageWindow2);
     vtkCanvas->setSize({400,400});
 
+    Button *b1 = new Button(imageWindow2, "Random Rotation");
+    b1->setCallback([vtkCanvas]() {
+      vtkCanvas->setRotation(nanogui::Vector3f((rand() % 100) / 100.0f,
+                                               (rand() % 100) / 100.0f,
+                                               (rand() % 100) / 100.0f));
+    });
+
     screen->performLayout();
     screen->drawAll();
     screen->setVisible(true);

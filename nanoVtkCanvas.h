@@ -146,6 +146,10 @@ public:
         mShader.free();
     }
 
+    void setRotation(nanogui::Vector3f vRotation) {
+        mRotation = vRotation;
+    }
+
     virtual void drawGL() override {
         using namespace nanogui;
 
