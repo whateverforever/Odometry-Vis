@@ -111,7 +111,7 @@ public:
 
         glEnable(GL_DEPTH_TEST);
         /* Draw 12 triangles starting at index 0 */
-        mShader.drawIndexed(GL_TRIANGLES, 0, 12);
+        mShader.drawIndexed(GL_LINE_STRIP, 0, 36);
         glDisable(GL_DEPTH_TEST);
     }
 
