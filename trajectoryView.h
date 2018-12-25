@@ -41,19 +41,20 @@ public:
             "}"
         );
 
-        MatrixXf positions(3, 8);
-        positions.col(0) << -1,  1,  1;
-        positions.col(1) << -1,  1, -1;
-        positions.col(2) <<  1,  1, -1;
-        positions.col(3) <<  1,  1,  1;
-        positions.col(4) << -1, -1,  1;
-        positions.col(5) << -1, -1, -1;
-        positions.col(6) <<  1, -1, -1;
-        positions.col(7) <<  1, -1,  1;
+        m_positions = MatrixXf(3, 8);
+
+        m_positions.col(0) << -1,  1,  1;
+        m_positions.col(1) << -1,  1, -1;
+        m_positions.col(2) <<  1,  1, -1;
+        m_positions.col(3) <<  1,  1,  1;
+        m_positions.col(4) << -1, -1,  1;
+        m_positions.col(5) << -1, -1, -1;
+        m_positions.col(6) <<  1, -1, -1;
+        m_positions.col(7) <<  1, -1,  1;
 
         mShader.bind();
 
-        mShader.uploadAttrib("position", positions);
+        mShader.uploadAttrib("position", m_positions);
     }
 
     ~TrajectoryView() {
@@ -62,6 +63,10 @@ public:
 
     void setRotation(nanogui::Vector3f vRotation) {
         mRotation = vRotation;
+    }
+
+    void addPoint(nanogui::Vector3f newPoint) {
+
     }
 
     virtual void drawGL() override {
@@ -85,6 +90,7 @@ public:
     }
 
 private:
+    nanogui::MatrixXf m_positions;
     nanogui::GLShader mShader;
     Eigen::Vector3f mRotation;
 };
