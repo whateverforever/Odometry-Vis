@@ -42,24 +42,6 @@ public:
             "}"
         );
 
-        MatrixXu indices(3, 12); /* Draw a cube */
-        indices.col( 0) << 0, 1, 3;
-        indices.col( 1) << 3, 2, 1;
-        indices.col( 2) << 3, 2, 6;
-        indices.col( 3) << 6, 7, 3;
-        indices.col( 4) << 7, 6, 5;
-        indices.col( 5) << 5, 4, 7;
-        indices.col( 6) << 4, 5, 1;
-        indices.col( 7) << 1, 0, 4;
-        indices.col( 8) << 4, 0, 3;
-        indices.col( 9) << 3, 7, 4;
-        indices.col(10) << 5, 6, 2;
-        indices.col(11) << 2, 1, 5;
-
-        // Positions are the only "real" vertices
-        // The indices above refer to these, so if
-        // a vertex is used for multiple edges, its
-        // position only needs to be defined once
         MatrixXf positions(3, 8);
         positions.col(0) << -1,  1,  1;
         positions.col(1) << -1,  1, -1;
@@ -85,7 +67,6 @@ public:
         colors.col(11) << 0.5, 1, 0.5;
 
         mShader.bind();
-        mShader.uploadIndices(indices);
 
         mShader.uploadAttrib("position", positions);
         mShader.uploadAttrib("color", colors);
@@ -115,7 +96,7 @@ public:
 
         glEnable(GL_DEPTH_TEST);
         /* Draw 12 triangles starting at index 0 */
-        mShader.drawIndexed(GL_LINE_STRIP, 0, 36);
+        mShader.drawArray(GL_LINE_STRIP, 0, 36);
         glDisable(GL_DEPTH_TEST);
     }
 
