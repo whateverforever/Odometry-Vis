@@ -56,6 +56,10 @@ public:
         indices.col(10) << 5, 6, 2;
         indices.col(11) << 2, 1, 5;
 
+        // Positions are the only "real" vertices
+        // The indices above refer to these, so if
+        // a vertex is used for multiple edges, its
+        // position only needs to be defined once
         MatrixXf positions(3, 8);
         positions.col(0) << -1,  1,  1;
         positions.col(1) << -1,  1, -1;
