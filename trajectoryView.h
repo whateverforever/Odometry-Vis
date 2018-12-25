@@ -41,19 +41,14 @@ public:
             "}"
         );
 
-        m_positions = MatrixXf(3, 8);
+        m_positions = MatrixXf(3, 4);
 
         m_positions.col(0) << -1,  1,  1;
         m_positions.col(1) << -1,  1, -1;
         m_positions.col(2) <<  1,  1, -1;
         m_positions.col(3) <<  1,  1,  1;
-        m_positions.col(4) << -1, -1,  1;
-        m_positions.col(5) << -1, -1, -1;
-        m_positions.col(6) <<  1, -1, -1;
-        m_positions.col(7) <<  1, -1,  1;
 
         mShader.bind();
-
         mShader.uploadAttrib("position", m_positions);
     }
 
@@ -66,7 +61,11 @@ public:
     }
 
     void addPoint(nanogui::Vector3f newPoint) {
+        m_positions.conservativeResize(Eigen::NoChange, m_positions.cols()+1);
+        m_positions.col(m_positions.cols()-1) = newPoint;
 
+        mShader.bind();
+        mShader.uploadAttrib("position", m_positions);
     }
 
     virtual void drawGL() override {
@@ -85,7 +84,7 @@ public:
 
         glEnable(GL_DEPTH_TEST);
         /* Draw 12 triangles starting at index 0 */
-        mShader.drawArray(GL_LINE_STRIP, 0, 36);
+        mShader.drawArray(GL_LINE_STRIP, 0, m_positions.cols()-1);
         glDisable(GL_DEPTH_TEST);
     }
 

@@ -78,9 +78,9 @@ int main(int /* argc */, char ** /* argv */) {
 
     Button *b2 = new Button(imageWindow2, "Add new point");
     b2->setCallback([vtkCanvas]() {
-      vtkCanvas->addPoint(nanogui::Vector3f((rand() % 100) / 100.0f,
-                                            (rand() % 100) / 100.0f,
-                                            (rand() % 100) / 100.0f));
+      vtkCanvas->addPoint(nanogui::Vector3f((rand() % 100) / 100.0f * 2 - 1,
+                                            (rand() % 100) / 100.0f * 2 - 1,
+                                            (rand() % 100) / 100.0f * 2 - 1));
     });
 
     screen->performLayout();
