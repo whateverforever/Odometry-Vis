@@ -1,6 +1,11 @@
 #ifndef VISUALIZATION_LIBRARY_H
 #define VISUALIZATION_LIBRARY_H
 
-void hello();
+class Vis {
+public:
+    Vis();
+    void hello();
+    void what();
+};
 
 #endif
