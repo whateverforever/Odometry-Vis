@@ -3,16 +3,22 @@
 #include <stdlib.h>
 #include <iostream>
 #include <thread>
+#include <functional>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/opencv.hpp>
 
 #include "library.h"
 
-void dataGenerator() {
+void dataGenerator(Vis *visualization) {
     // 1. generate data
     // 2. pass message w/ data
     // 3. listen in UI to message, act
+    std::cout << "From inside:" << visualization << std::endl;
+    
+    visualization->calledFromOutSide();
+    visualization->calledFromOutSide();
+    visualization->calledFromOutSide();
 }
 
 int main(int /* argc */, char ** /* argv */) {
@@ -29,12 +35,14 @@ int main(int /* argc */, char ** /* argv */) {
     }
 
     // Lib code!
-    auto Visualization = new Vis();
+    auto visu = new Vis();
 
-    std::thread dataThread(dataGenerator);
+    std::cout << "From outside:" << visu << std::endl;
 
-    Visualization->initUI();
-    Visualization->startUI();
+    std::thread dataThread(dataGenerator, std::ref(visu));
+
+    visu->initUI();
+    visu->startUI();
 
     dataThread.join();
 
