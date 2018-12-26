@@ -19,6 +19,10 @@ Vis::Vis() {
     m_frames["rgb_l"] = cv::Mat::zeros(600, 400, CV_8UC3);
 }
 
+void Vis::calledFromOutSide() {
+    std::cout << "LOLWASALTER" << std::endl;
+}
+
 void Vis::initUI() {
     using namespace nanogui;
 
@@ -65,7 +69,9 @@ void Vis::initUI() {
     screen->performLayout();
     screen->drawAll();
     screen->setVisible(true);
-    // blitframebuffer
+}
+
+void Vis::startUI() {
     nanogui::mainloop();
     nanogui::shutdown();
 }

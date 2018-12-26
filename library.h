@@ -4,6 +4,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <thread>
 
 #include <opencv2/core/core.hpp>
 
@@ -17,6 +18,8 @@ class Vis {
 public:
     Vis();
     void initUI();
+    void startUI();
+    void calledFromOutSide();
 private:
     std::map<std::string, cv::Mat> m_frames;
     nanogui::MatrixXf m_trajectoryPoints;

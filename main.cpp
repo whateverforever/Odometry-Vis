@@ -1,12 +1,19 @@
 #include "main.h"
 
-#include <iostream>
 #include <stdlib.h>
+#include <iostream>
+#include <thread>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/opencv.hpp>
 
 #include "library.h"
+
+void dataGenerator() {
+    // 1. generate data
+    // 2. pass message w/ data
+    // 3. listen in UI to message, act
+}
 
 int main(int /* argc */, char ** /* argv */) {
 
@@ -23,7 +30,13 @@ int main(int /* argc */, char ** /* argv */) {
 
     // Lib code!
     auto Visualization = new Vis();
+
+    std::thread dataThread(dataGenerator);
+
     Visualization->initUI();
+    Visualization->startUI();
+
+    dataThread.join();
 
     return 0;
 }
