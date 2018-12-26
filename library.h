@@ -2,7 +2,8 @@
 #define VISUALIZATION_LIBRARY_H
 
 #include <iostream>
-#include <vector>
+#include <map>
+#include <string>
 
 #include <opencv2/core/core.hpp>
 
@@ -10,13 +11,15 @@
 #include <nanogui/imagepanel.h>
 #include <nanogui/imageview.h>
 
+#include "trajectoryView.h"
+
 class Vis {
 public:
     Vis();
     void hello();
     void what();
 private:
-    std::vector<&cv::Mat> m_frames;
+    std::map<std::string, cv::Mat> m_frames;
     nanogui::MatrixXf m_trajectoryPoints;
 };
 

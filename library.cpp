@@ -16,7 +16,7 @@ GLuint getTextureForMat(cv::Mat &mat) {
 }
 
 Vis::Vis() {
-
+    m_frames["rgb_l"] = cv::Mat::zeros(600, 400, CV_8UC3);
 }
 
 void Vis::hello() {
@@ -33,16 +33,16 @@ void Vis::what() {
     auto imageWindow = new Window(screen, "RGB Left");
     imageWindow->setLayout(new BoxLayout(Orientation::Vertical, Alignment::Middle, 5, 5));
 
-    GLuint imageTexId = getTextureForMat(image);
+    GLuint rgbLeftTexId = getTextureForMat(m_frames["rgb_l"]);
 
-    auto imageView = new ImageView(imageWindow, imageTexId);
+    auto imageView = new ImageView(imageWindow, rgbLeftTexId);
     imageView->setFixedSize({300,200});
 
-    auto loadNewImgBtn = new Button(imageWindow, "Load new frame");
-    loadNewImgBtn->setCallback([imageTexId, image_2]() {
-        glBindTexture(GL_TEXTURE_2D, imageTexId);
-        glTexSubImage2D(GL_TEXTURE_2D, 0,0,0, image_2.cols, image_2.rows, GL_BGR, GL_UNSIGNED_BYTE, image_2.ptr());
-    });
+    // auto loadNewImgBtn = new Button(imageWindow, "Load new frame");
+    // loadNewImgBtn->setCallback([rgbLeftTexId, image_2]() {
+    //     glBindTexture(GL_TEXTURE_2D, rgbLeftTexId);
+    //     glTexSubImage2D(GL_TEXTURE_2D, 0,0,0, image_2.cols, image_2.rows, GL_BGR, GL_UNSIGNED_BYTE, image_2.ptr());
+    // });
 
     // To test layouting...
     auto imageWindow2 = new Window(screen, "RGB Right");
