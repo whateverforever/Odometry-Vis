@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <stdlib.h>
-#include <thread>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/opencv.hpp>
@@ -23,12 +22,8 @@ int main(int /* argc */, char ** /* argv */) {
     }
 
     // Lib code!
-    startUI();
+    auto Visualization = new Vis();
+    Visualization->initUI();
 
     return 0;
-}
-
-void startUI() {
-   auto Visualization = new Vis();
-   Visualization->initUI(); 
 }
