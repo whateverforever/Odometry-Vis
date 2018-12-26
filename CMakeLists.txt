@@ -3,6 +3,7 @@ project(Visualization)
 
 set(CMAKE_CXX_STANDARD 14)
 set(APP_EXE main)
+set(APP_LIB Visualization)
 
 # Nanogui
 add_subdirectory(nanogui)
@@ -18,10 +19,11 @@ include_directories(${OPENCV_INCLUDE_DIR})
 find_package(VTK 8.1.2 REQUIRED)
 include(${VTK_USE_FILE})
 
-add_library(Visualization library.cpp library.h)
+add_library(${APP_LIB} library.cpp library.h)
 add_executable(${APP_EXE} main.cpp main.h trajectoryView.h)
 
-target_link_libraries(${APP_EXE} Visualization nanogui opencv_core opencv_highgui opencv_features2d opencv_imgcodecs)
+target_link_libraries(${APP_EXE} ${APP_LIB} nanogui opencv_core opencv_highgui opencv_features2d opencv_imgcodecs)
+target_link_libraries(${APP_LIB} nanogui opencv_core opencv_highgui opencv_features2d opencv_imgcodecs)
 
 if(VTK_LIBRARIES)
     target_link_libraries(${APP_EXE} ${VTK_LIBRARIES})
