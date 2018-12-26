@@ -6,9 +6,7 @@
 #define VISUALIZATION_MAIN_H
 
 
-class main {
-
-};
-
+int main(int /* argc */, char ** /* argv */);
+void startUI();
 
 #endif //VISUALIZATION_MAIN_H
