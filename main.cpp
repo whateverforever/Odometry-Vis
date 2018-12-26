@@ -20,7 +20,8 @@ int main(int /* argc */, char ** /* argv */) {
     }
 
     // Lib code!
-
+    auto Visualization = new Vis();
+    Visualization->initUI();
 
     return 0;
 }
