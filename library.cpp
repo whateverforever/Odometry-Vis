@@ -23,11 +23,22 @@ void Vis::calledFromOutSide() {
     std::cout << "LOLWASALTER" << std::endl;
 }
 
+void Vis::addPoint() {
+    std::cout << "From inside addPoint" << m_view << std::endl;
+    std::cout << "From inside addPoint" << m_view->backgroundColor() << std::endl;
+
+  m_view->addPoint(nanogui::Vector3f((rand() % 100) / 100.0f * 2 - 1,
+                                     (rand() % 100) / 100.0f * 2 - 1,
+                                     (rand() % 100) / 100.0f * 2 - 1));
+  // m_screen->drawAll();
+}
+
 void Vis::initUI() {
     using namespace nanogui;
 
     nanogui::init();
     Screen *screen = new Screen({1000, 750}, "NanoGUI test");
+    m_screen = screen;
     screen->setLayout(new BoxLayout(Orientation::Horizontal, Alignment::Middle, 10, 10));
 
     auto imageWindow = new Window(screen, "RGB Left");
@@ -49,19 +60,21 @@ void Vis::initUI() {
     imageWindow2->setLayout(new BoxLayout(Orientation::Vertical, Alignment::Middle, 5, 5));
 
     // Display vtk
-    auto vtkCanvas = new TrajectoryView(imageWindow2);
-    vtkCanvas->setSize({400,400});
+    auto trajectoryView = new TrajectoryView(imageWindow2);
+    m_view = trajectoryView;
+
+    trajectoryView->setSize({400,400});
 
     Button *b1 = new Button(imageWindow2, "Random Rotation");
-    b1->setCallback([vtkCanvas]() {
-      vtkCanvas->setRotation(nanogui::Vector3f((rand() % 100) / 100.0f,
+    b1->setCallback([trajectoryView]() {
+      trajectoryView->setRotation(nanogui::Vector3f((rand() % 100) / 100.0f,
                                                (rand() % 100) / 100.0f,
                                                (rand() % 100) / 100.0f));
     });
 
     Button *b2 = new Button(imageWindow2, "Add new point");
-    b2->setCallback([vtkCanvas]() {
-      vtkCanvas->addPoint(nanogui::Vector3f((rand() % 100) / 100.0f * 2 - 1,
+    b2->setCallback([trajectoryView]() {
+      trajectoryView->addPoint(nanogui::Vector3f((rand() % 100) / 100.0f * 2 - 1,
                                             (rand() % 100) / 100.0f * 2 - 1,
                                             (rand() % 100) / 100.0f * 2 - 1));
     });

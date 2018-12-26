@@ -15,10 +15,12 @@ void dataGenerator(Vis *visualization) {
     // 2. pass message w/ data
     // 3. listen in UI to message, act
     std::cout << "From inside:" << visualization << std::endl;
-    
+
     visualization->calledFromOutSide();
     visualization->calledFromOutSide();
     visualization->calledFromOutSide();
+
+    visualization->addPoint();
 }
 
 int main(int /* argc */, char ** /* argv */) {
