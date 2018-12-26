@@ -16,8 +16,7 @@
 class Vis {
 public:
     Vis();
-    void hello();
-    void what();
+    void initUI();
 private:
     std::map<std::string, cv::Mat> m_frames;
     nanogui::MatrixXf m_trajectoryPoints;

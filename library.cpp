@@ -19,11 +19,7 @@ Vis::Vis() {
     m_frames["rgb_l"] = cv::Mat::zeros(600, 400, CV_8UC3);
 }
 
-void Vis::hello() {
-    std::cout << "Hello, World!" << std::endl;
-}
-
-void Vis::what() {
+void Vis::initUI() {
     using namespace nanogui;
 
     nanogui::init();
