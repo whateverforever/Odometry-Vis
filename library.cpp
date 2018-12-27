@@ -17,6 +17,7 @@ GLuint getTextureForMat(cv::Mat &mat) {
 
 Vis::Vis() {
     m_frames["rgb_l"] = cv::Mat::zeros(600, 400, CV_8UC3);
+    std::cout << "This: " << this << std::endl;
 }
 
 void Vis::calledFromOutSide() {
@@ -24,13 +25,20 @@ void Vis::calledFromOutSide() {
 }
 
 void Vis::addPoint() {
-    std::cout << "From inside addPoint" << m_view << std::endl;
+    std::cout << "From inside addPoint, m_view: " << m_view << std::endl;
+    std::cout << "From inside addPoint, this: " << this << std::endl;
     std::cout << "From inside addPoint" << m_view->backgroundColor() << std::endl;
 
   m_view->addPoint(nanogui::Vector3f((rand() % 100) / 100.0f * 2 - 1,
                                      (rand() % 100) / 100.0f * 2 - 1,
                                      (rand() % 100) / 100.0f * 2 - 1));
   // m_screen->drawAll();
+}
+
+void Vis::setDataSource(DataGenerator *source) {
+    m_dataSource = source;
+    std::cout << "DataSource: " << source << std::endl;
+    std::cout << "m_someValue: " << source->m_someValue << std::endl;
 }
 
 void Vis::initUI() {
@@ -66,10 +74,11 @@ void Vis::initUI() {
     trajectoryView->setSize({400,400});
 
     Button *b1 = new Button(imageWindow2, "Random Rotation");
-    b1->setCallback([trajectoryView]() {
+    b1->setCallback([trajectoryView, this]() {
       trajectoryView->setRotation(nanogui::Vector3f((rand() % 100) / 100.0f,
                                                (rand() % 100) / 100.0f,
                                                (rand() % 100) / 100.0f));
+      std::cout << m_dataSource->m_someValue << std::endl;
     });
 
     Button *b2 = new Button(imageWindow2, "Add new point");

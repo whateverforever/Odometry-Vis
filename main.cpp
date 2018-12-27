@@ -4,23 +4,19 @@
 #include <iostream>
 #include <thread>
 #include <functional>
+#include <chrono>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/opencv.hpp>
 
 #include "library.h"
+#include "DataGen.h"
 
-void dataGenerator(Vis *visualization) {
-    // 1. generate data
-    // 2. pass message w/ data
-    // 3. listen in UI to message, act
-    std::cout << "From inside:" << visualization << std::endl;
-
-    visualization->calledFromOutSide();
-    visualization->calledFromOutSide();
-    visualization->calledFromOutSide();
-
-    visualization->addPoint();
+void updateData(DataGenerator *dataGen) {
+    while(true) {
+        dataGen->updateValue();
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
 }
 
 int main(int /* argc */, char ** /* argv */) {
@@ -38,10 +34,13 @@ int main(int /* argc */, char ** /* argv */) {
 
     // Lib code!
     auto visu = new Vis();
+    auto DataGen = new DataGenerator();
+
+    visu->setDataSource(DataGen);
 
     std::cout << "From outside:" << visu << std::endl;
 
-    std::thread dataThread(dataGenerator, std::ref(visu));
+    std::thread dataThread(updateData, std::ref(DataGen));
 
     visu->initUI();
     visu->startUI();
