@@ -29,8 +29,8 @@ void DataGenerator::updateValue() {
     m_someValue += 10;
 
     if(m_activeImage == &m_image_1) {
-        m_activeImage = &m_image_1;
-    } else {
         m_activeImage = &m_image_2;
+    } else {
+        m_activeImage = &m_image_1;
     }
 }

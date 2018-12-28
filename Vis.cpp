@@ -16,23 +16,8 @@ GLuint getTextureForMat(cv::Mat &mat) {
 }
 
 Vis::Vis() {
-    m_frames["rgb_l"] = cv::Mat::zeros(600, 400, CV_8UC3);
+    m_frames["rgb_l"] = cv::Mat::zeros(480, 640, CV_8UC3);
     std::cout << "This: " << this << std::endl;
-}
-
-void Vis::calledFromOutSide() {
-    std::cout << "LOLWASALTER" << std::endl;
-}
-
-void Vis::addPoint() {
-    std::cout << "From inside addPoint, m_view: " << m_view << std::endl;
-    std::cout << "From inside addPoint, this: " << this << std::endl;
-    std::cout << "From inside addPoint" << m_view->backgroundColor() << std::endl;
-
-  m_view->addPoint(nanogui::Vector3f((rand() % 100) / 100.0f * 2 - 1,
-                                     (rand() % 100) / 100.0f * 2 - 1,
-                                     (rand() % 100) / 100.0f * 2 - 1));
-  // m_screen->drawAll();
 }
 
 void Vis::setDataSource(DataGenerator *source) {
@@ -46,7 +31,6 @@ void Vis::initUI() {
 
     nanogui::init();
     Screen *screen = new Screen({1000, 750}, "NanoGUI test");
-    m_screen = screen;
     screen->setLayout(new BoxLayout(Orientation::Horizontal, Alignment::Middle, 10, 10));
 
     auto imageWindow = new Window(screen, "RGB Left");
@@ -74,11 +58,19 @@ void Vis::initUI() {
     trajectoryView->setSize({400,400});
 
     Button *b1 = new Button(imageWindow2, "Random Rotation");
-    b1->setCallback([trajectoryView, this]() {
+    b1->setCallback([trajectoryView, this, rgbLeftTexId]() {
       trajectoryView->setRotation(nanogui::Vector3f((rand() % 100) / 100.0f,
                                                (rand() % 100) / 100.0f,
                                                (rand() % 100) / 100.0f));
+
+      cv::Mat newImg = *m_dataSource->m_activeImage;
+
+      std::cout << "Image address: " << m_dataSource->m_activeImage << std::endl;
       std::cout << m_dataSource->m_someValue << std::endl;
+      std::cout << "Image cols: " << newImg.cols << std::endl;
+
+      glBindTexture(GL_TEXTURE_2D, rgbLeftTexId);
+      glTexSubImage2D(GL_TEXTURE_2D, 0,0,0, newImg.cols, newImg.rows, GL_BGR, GL_UNSIGNED_BYTE, newImg.ptr());
     });
 
     Button *b2 = new Button(imageWindow2, "Add new point");

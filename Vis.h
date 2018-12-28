@@ -19,13 +19,9 @@ public:
     Vis();
     void initUI();
     void startUI();
-    void addPoint();
-    void calledFromOutSide();
     void setDataSource(DataGenerator*);
 private:
     std::map<std::string, cv::Mat> m_frames;
-    nanogui::MatrixXf m_trajectoryPoints;
-    nanogui::Screen *m_screen;
     TrajectoryView *m_view;
     DataGenerator *m_dataSource;
 };
