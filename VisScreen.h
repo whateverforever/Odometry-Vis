@@ -12,10 +12,7 @@ class VisScreen : public nanogui::Screen {
 public:
     VisScreen(const nanogui::Vector2i &size, const std::string &caption) : nanogui::Screen(size, caption){};
     void onUpdate(const std::function<void()> &callback);
-    void drawContents() override {
-        std::cout << "Calling callback.." << std::endl;
-        m_update_callback();
-    };
+    void drawContents() override { m_update_callback(); };
 
 private:
     std::function<void()> m_update_callback;

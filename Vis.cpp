@@ -31,9 +31,6 @@ void Vis::initUI() {
 
     nanogui::init();
     auto *screen = new VisScreen({1000, 750}, "NanoGUI test");
-    screen->onUpdate([](){
-        std::cout << "Callback :)" << std::endl;
-    });
     screen->setLayout(new BoxLayout(Orientation::Horizontal, Alignment::Middle, 10, 10));
 
     auto imageWindow = new Window(screen, "RGB Left");
@@ -44,11 +41,13 @@ void Vis::initUI() {
     auto imageView = new ImageView(imageWindow, rgbLeftTexId);
     imageView->setFixedSize({300,200});
 
-    // auto loadNewImgBtn = new Button(imageWindow, "Load new frame");
-    // loadNewImgBtn->setCallback([rgbLeftTexId, image_2]() {
-    //     glBindTexture(GL_TEXTURE_2D, rgbLeftTexId);
-    //     glTexSubImage2D(GL_TEXTURE_2D, 0,0,0, image_2.cols, image_2.rows, GL_BGR, GL_UNSIGNED_BYTE, image_2.ptr());
-    // });
+    // Use redraw to reload images & points from data sources
+    screen->onUpdate([this, rgbLeftTexId](){
+        cv::Mat newImg = *m_dataSource->m_activeImage;
+
+        glBindTexture(GL_TEXTURE_2D, rgbLeftTexId);
+        glTexSubImage2D(GL_TEXTURE_2D, 0,0,0, newImg.cols, newImg.rows, GL_BGR, GL_UNSIGNED_BYTE, newImg.ptr());
+    });
 
     // To test layouting...
     auto imageWindow2 = new Window(screen, "RGB Right");
@@ -61,15 +60,10 @@ void Vis::initUI() {
     trajectoryView->setSize({400,400});
 
     Button *b1 = new Button(imageWindow2, "Random Rotation");
-    b1->setCallback([trajectoryView, this, rgbLeftTexId]() {
+    b1->setCallback([trajectoryView, this]() {
       trajectoryView->setRotation(nanogui::Vector3f((rand() % 100) / 100.0f,
                                                (rand() % 100) / 100.0f,
                                                (rand() % 100) / 100.0f));
-
-      cv::Mat newImg = *m_dataSource->m_activeImage;
-
-      glBindTexture(GL_TEXTURE_2D, rgbLeftTexId);
-      glTexSubImage2D(GL_TEXTURE_2D, 0,0,0, newImg.cols, newImg.rows, GL_BGR, GL_UNSIGNED_BYTE, newImg.ptr());
     });
 
     Button *b2 = new Button(imageWindow2, "Add new point");
