@@ -3,3 +3,7 @@
 //
 
 #include "VisScreen.h"
+
+// TODO: Add possibility to register callback
+// The callback will be put in Vis.cpp and does the actual
+// data reloading.

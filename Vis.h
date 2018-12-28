@@ -11,7 +11,7 @@
 #include <nanogui/imagepanel.h>
 #include <nanogui/imageview.h>
 
-#include "trajectoryView.h"
+#include "TrajectoryView.h"
 #include "DataGen.h"
 
 class Vis {
