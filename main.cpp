@@ -9,7 +9,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/opencv.hpp>
 
-#include "library.h"
+#include "Vis.h"
 #include "DataGen.h"
 
 void updateData(DataGenerator *dataGen) {

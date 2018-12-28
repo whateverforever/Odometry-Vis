@@ -1,6 +1,6 @@
 #pragma once
 
-#include "library.h"
+#include "Vis.h"
 
 class DataGenerator {
 public:

@@ -1,4 +1,4 @@
-#include "library.h"
+#include "Vis.h"
 
 GLuint getTextureForMat(cv::Mat &mat) {
     GLuint imageTexId;

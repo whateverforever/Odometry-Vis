@@ -1,5 +1,4 @@
-#ifndef VISUALIZATION_LIBRARY_H
-#define VISUALIZATION_LIBRARY_H
+#pragma once
 
 #include <iostream>
 #include <map>
@@ -30,5 +29,3 @@ private:
     TrajectoryView *m_view;
     DataGenerator *m_dataSource;
 };
-
-#endif
