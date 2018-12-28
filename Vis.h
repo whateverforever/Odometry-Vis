@@ -13,6 +13,7 @@
 
 #include "TrajectoryView.h"
 #include "DataGen.h"
+#include "VisScreen.h"
 
 class Vis {
 public:

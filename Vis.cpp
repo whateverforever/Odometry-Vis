@@ -30,7 +30,10 @@ void Vis::initUI() {
     using namespace nanogui;
 
     nanogui::init();
-    Screen *screen = new Screen({1000, 750}, "NanoGUI test");
+    auto *screen = new VisScreen({1000, 750}, "NanoGUI test");
+    screen->onUpdate([](){
+        std::cout << "Callback :)" << std::endl;
+    });
     screen->setLayout(new BoxLayout(Orientation::Horizontal, Alignment::Middle, 10, 10));
 
     auto imageWindow = new Window(screen, "RGB Left");
