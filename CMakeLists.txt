@@ -15,18 +15,8 @@ add_definitions(${NANOGUI_EXTRA_DEFS})
 find_package(OpenCV REQUIRED)
 include_directories(${OPENCV_INCLUDE_DIR})
 
-# VTK
-find_package(VTK 8.1.2 REQUIRED)
-include(${VTK_USE_FILE})
-
 add_library(${APP_LIB} Vis.cpp Vis.h VisScreen.cpp VisScreen.h)
 add_executable(${APP_EXE} main.cpp main.h TrajectoryView.h VisScreen.cpp VisScreen.h)
 
 target_link_libraries(${APP_EXE} ${APP_LIB} nanogui opencv_core opencv_highgui opencv_features2d opencv_imgcodecs)
 target_link_libraries(${APP_LIB} nanogui opencv_core opencv_highgui opencv_features2d opencv_imgcodecs)
-
-if(VTK_LIBRARIES)
-    target_link_libraries(${APP_EXE} ${VTK_LIBRARIES})
-else()
-    target_link_libraries(${APP_EXE} vtkHybrid vtkWidgets)
-endif()
