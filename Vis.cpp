@@ -65,10 +65,6 @@ void Vis::initUI() {
 
       cv::Mat newImg = *m_dataSource->m_activeImage;
 
-      std::cout << "Image address: " << m_dataSource->m_activeImage << std::endl;
-      std::cout << m_dataSource->m_someValue << std::endl;
-      std::cout << "Image cols: " << newImg.cols << std::endl;
-
       glBindTexture(GL_TEXTURE_2D, rgbLeftTexId);
       glTexSubImage2D(GL_TEXTURE_2D, 0,0,0, newImg.cols, newImg.rows, GL_BGR, GL_UNSIGNED_BYTE, newImg.ptr());
     });
