@@ -2,4 +2,4 @@
 
 ## Current State
 
-![Latest screenshot](latest.gif)
+![Latest screenshot](docs/latest.gif)
