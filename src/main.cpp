@@ -7,13 +7,13 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/opencv.hpp>
 
-#include "DataGen.h"
 #include "Vis.h"
+#include "DataGen.h"
 
 void updateData(DataGenerator *dataGen) {
   while (true) {
     dataGen->updateValue();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
 }
 

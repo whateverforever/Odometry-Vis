@@ -3,10 +3,7 @@
 // Created by Max on 20.12.18.
 //
 
-#ifndef VISUALIZATION_TRAJECTORYVIEW_H
-#define VISUALIZATION_TRAJECTORYVIEW_H
-
-#endif // VISUALIZATION_TRAJECTORYVIEW_H
+#pragma once
 
 #include <nanogui/glcanvas.h>
 #include <nanogui/glutil.h>
