@@ -12,7 +12,7 @@
 void updateData(DataGenerator *dataGen) {
   while (true) {
     dataGen->updateValue();
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    std::this_thread::sleep_for(std::chrono::milliseconds(30)); // 30ms is ca 33fps
   }
 }
 
