@@ -8,7 +8,6 @@
 #include <opencv2/opencv.hpp>
 
 #include "Vis.h"
-#include "DataGen.h"
 
 void updateData(DataGenerator *dataGen) {
   while (true) {
