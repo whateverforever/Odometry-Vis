@@ -7,5 +7,5 @@ set -x
 cd build && \
 cmake .. && \
 make && \
-./main
+./src/main
 )
