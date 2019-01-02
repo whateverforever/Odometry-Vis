@@ -18,6 +18,8 @@ GLuint getTextureForMat(cv::Mat &mat) {
 Vis::Vis() {
     m_frames["rgb_l"] = cv::Mat::zeros(480, 640, CV_8UC3);
     std::cout << "This: " << this << std::endl;
+
+    m_lastFrameTime = glfwGetTime();
 }
 
 void Vis::setDataSource(DataGenerator *source) {
@@ -43,6 +45,17 @@ void Vis::initUI() {
 
     // Use redraw to reload images & points from data sources
     screen->onUpdate([this, rgbLeftTexId](){
+        double currentTime = glfwGetTime();
+
+        if(currentTime - m_lastFrameTime >= 1.0) {
+            m_fps = m_numElapsedFrames;
+            m_numElapsedFrames = 0;
+            m_lastFrameTime = glfwGetTime();
+
+            std::cout << "FPS: " << m_fps << std::endl;
+        }
+
+        m_numElapsedFrames += 1;
         cv::Mat newImg = *m_dataSource->m_activeImage;
 
         glBindTexture(GL_TEXTURE_2D, rgbLeftTexId);

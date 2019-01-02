@@ -22,6 +22,10 @@ public:
     void startUI();
     void setDataSource(DataGenerator*);
 private:
+    double m_lastFrameTime;
+    int m_numElapsedFrames;
+    double m_fps;
+    
     std::map<std::string, cv::Mat> m_frames;
     TrajectoryView *m_view;
     DataGenerator *m_dataSource;
