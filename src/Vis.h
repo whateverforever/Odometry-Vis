@@ -21,6 +21,7 @@ public:
   void initUI();
   void startUI();
   void setDataSource(DataGenerator *);
+  void someFunc();
 
 private:
   double m_lastFrameTime;

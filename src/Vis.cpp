@@ -96,7 +96,20 @@ void Vis::initUI() {
   screen->setVisible(true);
 }
 
+void Vis::someFunc() {
+  while(true) {
+    std::cout << "what" << std::endl;
+    break;
+  }
+}
+
 void Vis::startUI() {
+  std::cout << "Starting dataReloadThread.." << std::endl;
+  std::thread dataReloadThread([this] { this->someFunc(); });
+  std::cout << "DataReloadThread: " << &dataReloadThread << std::endl;
+
   nanogui::mainloop();
   nanogui::shutdown();
+  
+  dataReloadThread.join();
 }
