@@ -6,8 +6,8 @@ set(APP_EXE main)
 set(APP_LIB Visualization)
 
 # Nanogui
-add_subdirectory(nanogui)
-include_directories(nanogui/include)
+add_subdirectory(lib/nanogui)
+include_directories(lib/nanogui/include)
 include_directories(${NANOGUI_EXTRA_INCS})
 add_definitions(${NANOGUI_EXTRA_DEFS})
 
