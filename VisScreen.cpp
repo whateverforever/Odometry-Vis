@@ -9,5 +9,5 @@
 // data reloading.
 
 void VisScreen::onUpdate(const std::function<void()> &callback) {
-    m_update_callback = callback;
+  m_update_callback = callback;
 }
