@@ -33,25 +33,28 @@ void Vis::initUI() {
   using namespace nanogui;
 
   nanogui::init();
-  auto *screen = new VisScreen({1000, 750}, "NanoGUI test");
+  auto screen = new VisScreen({1000, 750}, "NanoGUI test");
   screen->setLayout(
       new BoxLayout(Orientation::Horizontal, Alignment::Middle, 10, 10));
 
-  auto imageWindow = new Window(screen, "RGB Left");
-  imageWindow->setLayout(
-      new BoxLayout(Orientation::Vertical, Alignment::Middle, 5, 5));
+  auto rgbImageWindow = new Window(screen, "RGB");
+  rgbImageWindow->setLayout(
+      new BoxLayout(Orientation::Horizontal, Alignment::Middle, 5, 5));
 
   GLuint rgbLeftTexId = getTextureForMat(m_frames["rgb_l"]);
 
-  auto imageView = new ImageView(imageWindow, rgbLeftTexId);
-  imageView->setFixedSize({300, 200});
+  auto rgbLeftView = new ImageView(rgbImageWindow, rgbLeftTexId);
+  rgbLeftView->setFixedSize({300, 200});
+
+  auto rgbRightView = new ImageView(rgbImageWindow, rgbLeftTexId);
+  rgbRightView->setFixedSize({300, 200});
 
   // To test layouting...
   auto imageWindow2 = new Window(screen, "RGB Right");
   imageWindow2->setLayout(
       new BoxLayout(Orientation::Vertical, Alignment::Middle, 5, 5));
 
-  // Display vtk
+  // Display the 3d trajectory
   auto trajectoryView = new TrajectoryView(imageWindow2);
   m_view = trajectoryView;
 
@@ -77,7 +80,6 @@ void Vis::initUI() {
   // Use redraw to reload images & points from data sources
   screen->onUpdate([this, rgbLeftTexId, trajectoryView]() {
     double currentTime = glfwGetTime();
-
     if (currentTime - m_lastFrameTime >= 1.0) {
       m_fps = m_numElapsedFrames;
       m_numElapsedFrames = 0;
@@ -85,7 +87,6 @@ void Vis::initUI() {
 
       std::cout << "FPS: " << m_fps << std::endl;
     }
-
     m_numElapsedFrames += 1;
 
     // Load new images
