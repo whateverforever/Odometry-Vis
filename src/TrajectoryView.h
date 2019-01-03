@@ -52,6 +52,12 @@ public:
 
   void setRotation(nanogui::Vector3f vRotation) { mRotation = vRotation; }
 
+  std::unique_ptr<nanogui::Vector3f> getLastPoint() {
+    return std::make_unique<nanogui::Vector3f>(
+        m_positions.col(m_positions.cols() - 1)
+        );
+  }
+
   void addPoint(nanogui::Vector3f newPoint) {
     m_positions.conservativeResize(Eigen::NoChange, m_positions.cols() + 1);
     m_positions.col(m_positions.cols() - 1) = newPoint;

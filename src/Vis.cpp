@@ -86,9 +86,18 @@ void Vis::initUI() {
 
   Button *b2 = new Button(imageWindow2, "Add new point");
   b2->setCallback([trajectoryView]() {
-    trajectoryView->addPoint(nanogui::Vector3f(
+
+    auto newPoint = nanogui::Vector3f(
         (rand() % 100) / 100.0f * 2 - 1, (rand() % 100) / 100.0f * 2 - 1,
-        (rand() % 100) / 100.0f * 2 - 1));
+        (rand() % 100) / 100.0f * 2 - 1);
+
+    trajectoryView->addPoint(newPoint);
+
+    std::unique_ptr<nanogui::Vector3f> lastPoint = trajectoryView->getLastPoint();
+
+    auto diff = *lastPoint - newPoint;
+
+    std::cout << "Diff: " << diff << std::endl;
   });
 
   screen->performLayout();
