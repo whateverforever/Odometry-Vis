@@ -46,26 +46,6 @@ void Vis::initUI() {
   auto imageView = new ImageView(imageWindow, rgbLeftTexId);
   imageView->setFixedSize({300, 200});
 
-  // Use redraw to reload images & points from data sources
-  screen->onUpdate([this, rgbLeftTexId]() {
-    double currentTime = glfwGetTime();
-
-    if (currentTime - m_lastFrameTime >= 1.0) {
-      m_fps = m_numElapsedFrames;
-      m_numElapsedFrames = 0;
-      m_lastFrameTime = glfwGetTime();
-
-      std::cout << "FPS: " << m_fps << std::endl;
-    }
-
-    m_numElapsedFrames += 1;
-    cv::Mat newImg = *m_dataSource->m_activeImage;
-
-    glBindTexture(GL_TEXTURE_2D, rgbLeftTexId);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, newImg.cols, newImg.rows, GL_BGR,
-                    GL_UNSIGNED_BYTE, newImg.ptr());
-  });
-
   // To test layouting...
   auto imageWindow2 = new Window(screen, "RGB Right");
   imageWindow2->setLayout(
@@ -92,12 +72,41 @@ void Vis::initUI() {
         (rand() % 100) / 100.0f * 2 - 1);
 
     trajectoryView->addPoint(newPoint);
+  });
 
-    std::unique_ptr<nanogui::Vector3f> lastPoint = trajectoryView->getLastPoint();
+  // Use redraw to reload images & points from data sources
+  screen->onUpdate([this, rgbLeftTexId, trajectoryView]() {
+    double currentTime = glfwGetTime();
 
-    auto diff = *lastPoint - newPoint;
+    if (currentTime - m_lastFrameTime >= 1.0) {
+      m_fps = m_numElapsedFrames;
+      m_numElapsedFrames = 0;
+      m_lastFrameTime = glfwGetTime();
 
-    std::cout << "Diff: " << diff << std::endl;
+      std::cout << "FPS: " << m_fps << std::endl;
+    }
+
+    m_numElapsedFrames += 1;
+
+    // Load new images
+    cv::Mat newImg = *m_dataSource->m_activeImage;
+
+    glBindTexture(GL_TEXTURE_2D, rgbLeftTexId);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, newImg.cols, newImg.rows, GL_BGR,
+                    GL_UNSIGNED_BYTE, newImg.ptr());
+
+    // Load new trajectory points
+    nanogui::Vector3f latestSrcPoint = m_dataSource->getLatestPoint();
+    
+    std::unique_ptr<nanogui::Vector3f> lastDisplayedPoint = trajectoryView->getLastPoint();
+
+    auto diffToLastPoint = *lastDisplayedPoint - latestSrcPoint;
+
+    if(diffToLastPoint.isMuchSmallerThan(0.01)) {
+      return;
+    }
+
+    trajectoryView->addPoint(latestSrcPoint);
   });
 
   screen->performLayout();

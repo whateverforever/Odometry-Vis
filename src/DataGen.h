@@ -11,6 +11,7 @@ class DataGenerator {
 public:
   DataGenerator();
   void updateValue();
+  nanogui::Vector3f getLatestPoint();
   friend class Vis;
 
 private:
@@ -41,6 +42,10 @@ float RandomFloat(float a, float b) {
     float diff = b - a;
     float r = random * diff;
     return a + r;
+}
+
+nanogui::Vector3f DataGenerator::getLatestPoint() {
+  return m_trajectoryPoints.back();
 }
 
 void DataGenerator::updateValue() {
