@@ -4,6 +4,7 @@ project(Visualization)
 set(CMAKE_CXX_STANDARD 14)
 set(APP_EXE main)
 set(APP_LIB Visualization)
+set(CMAKE_CXX_FLAGS "-O3")
 
 # Nanogui
 add_subdirectory(lib/nanogui)
