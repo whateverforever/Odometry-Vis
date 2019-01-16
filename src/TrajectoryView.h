@@ -10,6 +10,8 @@
 #include <nanogui/opengl.h>
 #include <nanogui/widget.h>
 
+#include <Eigen/Geometry>
+
 class TrajectoryView : public nanogui::GLCanvas {
 public:
   TrajectoryView(Widget *parent) : nanogui::GLCanvas(parent) {
@@ -96,8 +98,8 @@ public:
                     0,  -l,   0,   l,   0,  -l,   0,   l,  -l,   l,  -l,  -l,  -l,   l,   l,   l;
     // clang-format on
 
-    newCamVerts.colwise() += newPoint;
     newCamVerts = newRotation * newCamVerts;
+    newCamVerts.colwise() += newPoint;
 
     m_cameraLines.conservativeResize(Eigen::NoChange, m_cameraLines.cols() + 16);
     m_cameraLines.block<3,16>(0, m_cameraLines.cols()-16) = newCamVerts;
