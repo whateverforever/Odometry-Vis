@@ -3,17 +3,12 @@
 GLuint getTextureId() {
   GLuint imageTexId;
   glGenTextures(1, &imageTexId);
-
-  return imageTexId;
-}
-
-GLuint getTextureForMat(cv::Mat &mat) {
-  GLuint imageTexId = getTextureId();
-
   glBindTexture(GL_TEXTURE_2D, imageTexId);
 
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mat.cols, mat.rows, 0, GL_BGR,
-               GL_UNSIGNED_BYTE, mat.ptr());
+  cv::Mat blankImgData = cv::Mat::zeros(480, 640, CV_8UC3);
+
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, blankImgData.cols, blankImgData.rows, 0, GL_BGR,
+               GL_UNSIGNED_BYTE, blankImgData.ptr());
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -24,16 +19,7 @@ GLuint getTextureForMat(cv::Mat &mat) {
 }
 
 Vis::Vis() {
-  m_frames["rgb_l"] = cv::Mat::zeros(480, 640, CV_8UC3);
-
   m_lastFrameTime = glfwGetTime();
-}
-
-void Vis::addTrajectoryPoint(nanogui::Vector3f point) {
-  std::cout << "lel" << std::endl;
-  m_pointBuffer.push_back(point);
-
-  // m_view->addPoint(point);
 }
 
 void Vis::loadNewestKeyframe(const odometry::KeyFrame &keyframe) {
@@ -56,12 +42,10 @@ void Vis::start() {
   m_rgbRightTexId = getTextureId();
   m_depthLeftTexId = getTextureId();
 
-  GLuint rgbLeftTexId = getTextureForMat(m_frames["rgb_l"]);
-
-  auto rgbLeftView = new ImageView(rgbImageWindow, rgbLeftTexId);
+  auto rgbLeftView = new ImageView(rgbImageWindow, m_rgbLeftTexId);
   rgbLeftView->setFixedSize({300, 200});
 
-  auto rgbRightView = new ImageView(rgbImageWindow, rgbLeftTexId);
+  auto rgbRightView = new ImageView(rgbImageWindow, m_rgbLeftTexId);
   rgbRightView->setFixedSize({300, 200});
 
   // To test layouting...
@@ -93,7 +77,7 @@ void Vis::start() {
   });
 
   // Use redraw to reload images & points from data sources
-  screen->onUpdate([this, rgbLeftTexId, trajectoryView]() {
+  screen->onUpdate([this, trajectoryView]() {
     /******** <FPS> ********/
     double currentTime = glfwGetTime();
     if (currentTime - m_lastFrameTime >= 1.0) {
@@ -112,7 +96,7 @@ void Vis::start() {
 
       auto leftRGB = keyframe.GetLeftImg();
 
-      glBindTexture(GL_TEXTURE_2D, rgbLeftTexId);
+      glBindTexture(GL_TEXTURE_2D, m_rgbLeftTexId);
       glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, leftRGB.cols, leftRGB.rows, GL_BGR,
                       GL_UNSIGNED_BYTE, leftRGB.ptr());
     }

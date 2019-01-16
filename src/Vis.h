@@ -19,9 +19,7 @@ class Vis {
 public:
   Vis();
   void start();
-  void addTrajectoryPoint(nanogui::Vector3f);
   void loadNewestKeyframe(const odometry::KeyFrame &);
-  void someFunc();
 
 private:
   double m_lastFrameTime;
@@ -31,8 +29,6 @@ private:
   GLuint m_rgbRightTexId;
   GLuint m_depthLeftTexId;
 
-  std::map<std::string, cv::Mat> m_frames;
-  std::vector<nanogui::Vector3f> m_pointBuffer;
   std::vector<odometry::KeyFrame> m_keyframeBuffer;
   TrajectoryView *m_view;
 };
