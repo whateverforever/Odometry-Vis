@@ -104,8 +104,14 @@ void Vis::start() {
     //                 GL_UNSIGNED_BYTE, newImg.ptr());
 
     // Load buffered keyframes
-    for(const odometry::KeyFrame &keyframe : m_keyframeBuffer) {
+    for(odometry::KeyFrame &keyframe : m_keyframeBuffer) {
       std::cout << "Processing new keyframe" << std::endl;
+
+      auto leftRGB = keyframe.GetLeftImg();
+
+      glBindTexture(GL_TEXTURE_2D, rgbLeftTexId);
+      glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, leftRGB.cols, leftRGB.rows, GL_BGR,
+                      GL_UNSIGNED_BYTE, leftRGB.ptr());
     }
 
     m_keyframeBuffer.clear();
