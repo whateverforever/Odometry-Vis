@@ -49,7 +49,7 @@ public:
         "in vec3 position;\n"
         "out vec4 frag_color;\n"
         "void main() {\n"
-        "    frag_color = vec4(0.5, 0.5, 1.0, 1.0);\n"
+        "    frag_color = vec4(0.6, 0.6, 1.0, 1.0);\n"
         "    gl_Position = modelViewProj * vec4(position, 1.0);\n"
         "}",
 
@@ -82,16 +82,27 @@ public:
     m_trajShader.bind();
     m_trajShader.uploadAttrib("position", m_positions);
 
+    auto cameraLines = nanogui::MatrixXf(3, 16);
+    auto l = 1;
+
+    // clang-format off
+    cameraLines <<  0,   l,   0,   l,   0,  -l,   0,  -l,   l,   l,   l,  -l,  -l,  -l,  -l,   l, 
+                    0, 2*l,   0, 2*l,   0, 2*l,   0, 2*l, 2*l, 2*l, 2*l, 2*l, 2*l, 2*l, 2*l, 2*l,
+                    0,  -l,   0,   l,   0,  -l,   0,   l,  -l,   l,  -l,  -l,  -l,   l,   l,   l;
+    // clang-format on
+
     m_camSymShader.bind();
-    m_camSymShader.uploadAttrib("position", m_positions);
+    m_camSymShader.uploadAttrib("position", cameraLines);
   }
 
   virtual void drawGL() override {
     using namespace nanogui;
+    glEnable(GL_DEPTH_TEST);
+
+    float fTime = (float)glfwGetTime();
 
     Matrix4f mvp;
     mvp.setIdentity();
-    float fTime = (float)glfwGetTime();
     mvp.topLeftCorner<3, 3>() =
         Eigen::Matrix3f(
             Eigen::AngleAxisf(mRotation[0] * fTime, Vector3f::UnitX()) *
@@ -102,16 +113,20 @@ public:
     m_trajShader.bind();
     m_trajShader.setUniform("modelViewProj", mvp);
 
-    glEnable(GL_DEPTH_TEST);
     m_trajShader.drawArray(GL_LINE_STRIP, 0, m_positions.cols() - 1);
-    glDisable(GL_DEPTH_TEST);
 
+    mvp.topLeftCorner<3, 3>() =
+        Eigen::Matrix3f(
+            Eigen::AngleAxisf(mRotation[0] * fTime, Vector3f::UnitX()) *
+            Eigen::AngleAxisf(mRotation[1] * fTime, Vector3f::UnitY()) *
+            Eigen::AngleAxisf(mRotation[2] * fTime, Vector3f::UnitZ())) *
+        0.25f;
 
     m_camSymShader.bind();
     m_camSymShader.setUniform("modelViewProj", mvp);
 
-    glEnable(GL_DEPTH_TEST);
     m_camSymShader.drawArray(GL_LINE_STRIP, 0, m_positions.cols() - 1);
+    
     glDisable(GL_DEPTH_TEST);
   }
 
