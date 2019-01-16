@@ -28,7 +28,7 @@ public:
         "in vec3 position;\n"
         "out vec4 frag_color;\n"
         "void main() {\n"
-        "    frag_color = vec4(0.8, 0.0, 0.0, 0.8);\n"
+        "    frag_color = vec4(0.7, 0.7, 0.7, 1.0);\n"
         "    gl_Position = modelViewProj * vec4(position, 1.0);\n"
         "}",
 
@@ -50,7 +50,7 @@ public:
         "in vec3 position;\n"
         "out vec4 frag_color;\n"
         "void main() {\n"
-        "    frag_color = vec4(0.6, 0.6, 1.0, 1.0);\n"
+        "    frag_color = vec4(1.0, 1.0, 1.0, 1.0);\n"
         "    gl_Position = modelViewProj * vec4(position, 1.0);\n"
         "}",
 
@@ -88,7 +88,7 @@ public:
 
 
     auto newCamVerts = nanogui::MatrixXf(3, 16);
-    auto l = 0.4;
+    auto l = 0.35;
 
     // clang-format off
     newCamVerts <<  0,   l,   0,   l,   0,  -l,   0,  -l,   l,   l,   l,  -l,  -l,  -l,  -l,   l, 
@@ -128,7 +128,7 @@ public:
     m_camSymShader.bind();
     m_camSymShader.setUniform("modelViewProj", mvp);
 
-    m_camSymShader.drawArray(GL_LINE_STRIP, 0, m_cameraLines.cols());
+    m_camSymShader.drawArray(GL_LINES, 0, m_cameraLines.cols());
     
     glDisable(GL_DEPTH_TEST);
   }
