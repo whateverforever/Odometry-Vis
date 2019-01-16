@@ -20,7 +20,6 @@ public:
   Vis();
   void initUI();
   void startUI();
-  void setDataSource(DataGenerator *);
   void addTrajectoryPoint(nanogui::Vector3f);
   void someFunc();
 
@@ -32,5 +31,4 @@ private:
   std::map<std::string, cv::Mat> m_frames;
   std::vector<nanogui::Vector3f> m_pointBuffer;
   TrajectoryView *m_view;
-  DataGenerator *m_dataSource;
 };

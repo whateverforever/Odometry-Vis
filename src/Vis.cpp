@@ -23,12 +23,6 @@ Vis::Vis() {
   m_lastFrameTime = glfwGetTime();
 }
 
-void Vis::setDataSource(DataGenerator *source) {
-  m_dataSource = source;
-  std::cout << "DataSource: " << source << std::endl;
-  std::cout << "m_someValue: " << source->m_someValue << std::endl;
-}
-
 void Vis::addTrajectoryPoint(nanogui::Vector3f point) {
   std::cout << "lel" << std::endl;
   m_pointBuffer.push_back(point);
@@ -86,6 +80,7 @@ void Vis::initUI() {
 
   // Use redraw to reload images & points from data sources
   screen->onUpdate([this, rgbLeftTexId, trajectoryView]() {
+    /******** FPS ********/
     double currentTime = glfwGetTime();
     if (currentTime - m_lastFrameTime >= 1.0) {
       m_fps = m_numElapsedFrames;
@@ -95,13 +90,14 @@ void Vis::initUI() {
       std::cout << "FPS: " << m_fps << std::endl;
     }
     m_numElapsedFrames += 1;
+    /******** /FPS ********/
 
     // Load new images
-    cv::Mat newImg = *m_dataSource->m_activeImage;
+    // cv::Mat newImg = *m_dataSource->m_activeImage;
 
-    glBindTexture(GL_TEXTURE_2D, rgbLeftTexId);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, newImg.cols, newImg.rows, GL_BGR,
-                    GL_UNSIGNED_BYTE, newImg.ptr());
+    // glBindTexture(GL_TEXTURE_2D, rgbLeftTexId);
+    // glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, newImg.cols, newImg.rows, GL_BGR,
+    //                 GL_UNSIGNED_BYTE, newImg.ptr());
 
     // Load new trajectory points
     for(const nanogui::Vector3f &vec : m_pointBuffer) {

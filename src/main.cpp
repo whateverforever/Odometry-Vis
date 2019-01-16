@@ -14,8 +14,6 @@ int main(int /* argc */, char ** /* argv */) {
   auto myUI = new Vis();
   auto dataGenerator = new DataGenerator();
 
-  myUI->setDataSource(dataGenerator);
-
   // Simulates the threads from Liu & Yu
   std::thread dataThread([dataGenerator, myUI](){
     
