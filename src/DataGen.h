@@ -11,8 +11,7 @@
 class DataGenerator {
  public:
   DataGenerator();
-  odometry::KeyFrame updateValue();
-  nanogui::Vector3f getLatestPoint();
+  odometry::KeyFrame getLatestKeyframe();
 
  private:
   cv::Mat m_image_1;
@@ -35,7 +34,7 @@ float RandomFloat(float a, float b) {
   return a + r;
 }
 
-odometry::KeyFrame DataGenerator::updateValue() {
+odometry::KeyFrame DataGenerator::getLatestKeyframe() {
   auto p_leftRGB = std::make_shared<cv::Mat>(m_image_1);
   auto p_rightRGB = std::make_shared<cv::Mat>(m_image_2);
   auto p_leftDepth = std::make_shared<cv::Mat>(m_image_1);
