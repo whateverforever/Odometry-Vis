@@ -15,9 +15,9 @@ public:
   TrajectoryView(Widget *parent) : nanogui::GLCanvas(parent) {
     using namespace nanogui;
 
-    mShader.init(
+    m_trajShader.init(
         /* An identifying name */
-        "a_simple_shader",
+        "trajectory_shader",
 
         /* Vertex shader */
         "#version 330\n"
@@ -25,7 +25,7 @@ public:
         "in vec3 position;\n"
         "out vec4 frag_color;\n"
         "void main() {\n"
-        "    frag_color = vec4(0.8, 0.8, 0.8, 1.0);\n"
+        "    frag_color = vec4(0.8, 0.0, 0.0, 0.8);\n"
         "    gl_Position = modelViewProj * vec4(position, 1.0);\n"
         "}",
 
@@ -44,8 +44,8 @@ public:
     m_positions.col(2) << 1, 1, -1;
     m_positions.col(3) << 1, 1, 1;
 
-    mShader.bind();
-    mShader.uploadAttrib("position", m_positions);
+    m_trajShader.bind();
+    m_trajShader.uploadAttrib("position", m_positions);
 
     m_camSymShader.init(
         /* An identifying name */
@@ -74,7 +74,7 @@ public:
   }
 
   ~TrajectoryView() {
-    mShader.free();
+    m_trajShader.free();
     m_camSymShader.free();
 }
 
@@ -89,8 +89,12 @@ public:
   void addPoint(nanogui::Vector3f newPoint) {
     m_positions.conservativeResize(Eigen::NoChange, m_positions.cols() + 1);
     m_positions.col(m_positions.cols() - 1) = newPoint;
-    mShader.bind();
-    mShader.uploadAttrib("position", m_positions);
+    
+    m_trajShader.bind();
+    m_trajShader.uploadAttrib("position", m_positions);
+
+    m_camSymShader.bind();
+    m_camSymShader.uploadAttrib("position", m_positions);
   }
 
   virtual void drawGL() override {
@@ -106,24 +110,25 @@ public:
             Eigen::AngleAxisf(mRotation[2] * fTime, Vector3f::UnitZ())) *
         0.25f;
 
-    mShader.bind();
-    mShader.setUniform("modelViewProj", mvp);
+    m_trajShader.bind();
+    m_trajShader.setUniform("modelViewProj", mvp);
 
     glEnable(GL_DEPTH_TEST);
-    mShader.drawArray(GL_LINE_STRIP, 0, m_positions.cols() - 1);
+    m_trajShader.drawArray(GL_LINE_STRIP, 0, m_positions.cols() - 1);
     glDisable(GL_DEPTH_TEST);
 
 
     m_camSymShader.bind();
     m_camSymShader.setUniform("modelViewProj", mvp);
+
     glEnable(GL_DEPTH_TEST);
-    m_camSymShader.drawArray(GL_LINE, 0, m_positions.cols() - 1);
+    m_camSymShader.drawArray(GL_LINE_STRIP, 0, m_positions.cols() - 1);
     glDisable(GL_DEPTH_TEST);
   }
 
 private:
   nanogui::MatrixXf m_positions;
-  nanogui::GLShader mShader;
+  nanogui::GLShader m_trajShader;
   nanogui::GLShader m_camSymShader;
   Eigen::Vector3f mRotation;
 };
