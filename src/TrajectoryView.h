@@ -17,7 +17,7 @@ public:
   TrajectoryView(Widget *parent) : nanogui::GLCanvas(parent) {
     using namespace nanogui;
     
-    m_positions = MatrixXf::Zero(3, 4);
+    m_positions = MatrixXf::Zero(3, 1);
     m_cameraLines = MatrixXf::Zero(3,16);
 
     m_trajShader.init(
