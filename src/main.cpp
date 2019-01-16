@@ -23,7 +23,8 @@ int main(int /* argc */, char ** /* argv */) {
 
       auto latestKeyframe = dataGenerator->getLatestKeyframe();
 
-      // auto latestCamPose = latestKeyframe.GetAbsoPose();
+      myUI->loadNewestKeyframe(latestKeyframe);
+
       // auto latestCamPosition = latestCamPose.block<3,1>(0,3);
       // auto latestPoint = dataGenerator->getLatestPoint();
       // myUI->addTrajectoryPoint(latestPoint);
