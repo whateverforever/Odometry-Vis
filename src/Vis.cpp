@@ -18,6 +18,12 @@ GLuint getTextureId() {
   return imageTexId;
 }
 
+void bindMatToTexture(const cv::Mat &image, GLuint textureId) {
+  glBindTexture(GL_TEXTURE_2D, textureId);
+  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, image.cols, image.rows, GL_BGR,
+                  GL_UNSIGNED_BYTE, image.ptr());
+}
+
 Vis::Vis() {
   m_lastFrameTime = glfwGetTime();
 }
@@ -38,6 +44,8 @@ void Vis::start() {
   rgbImageWindow->setLayout(
       new BoxLayout(Orientation::Horizontal, Alignment::Middle, 5, 5));
 
+  
+  // Reserve some Textures for later images
   m_rgbLeftTexId = getTextureId();
   m_rgbRightTexId = getTextureId();
   m_depthLeftTexId = getTextureId();
@@ -45,8 +53,9 @@ void Vis::start() {
   auto rgbLeftView = new ImageView(rgbImageWindow, m_rgbLeftTexId);
   rgbLeftView->setFixedSize({300, 200});
 
-  auto rgbRightView = new ImageView(rgbImageWindow, m_rgbLeftTexId);
+  auto rgbRightView = new ImageView(rgbImageWindow, m_rgbRightTexId);
   rgbRightView->setFixedSize({300, 200});
+
 
   // To test layouting...
   auto imageWindow2 = new Window(screen, "RGB Right");
@@ -96,9 +105,7 @@ void Vis::start() {
 
       auto leftRGB = keyframe.GetLeftImg();
 
-      glBindTexture(GL_TEXTURE_2D, m_rgbLeftTexId);
-      glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, leftRGB.cols, leftRGB.rows, GL_BGR,
-                      GL_UNSIGNED_BYTE, leftRGB.ptr());
+      bindMatToTexture(leftRGB, m_rgbLeftTexId);
     }
 
     m_keyframeBuffer.clear();
