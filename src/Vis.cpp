@@ -104,8 +104,10 @@ void Vis::start() {
       std::cout << "Processing new keyframe" << std::endl;
 
       auto leftRGB = keyframe.GetLeftImg();
+      auto rightRGB = keyframe.GetRightImg();
 
       bindMatToTexture(leftRGB, m_rgbLeftTexId);
+      bindMatToTexture(rightRGB, m_rgbRightTexId);
     }
 
     m_keyframeBuffer.clear();
