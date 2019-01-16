@@ -7,8 +7,8 @@ GLuint getTextureId() {
 
   cv::Mat blankImgData = cv::Mat::zeros(480, 640, CV_8UC3);
 
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, blankImgData.cols, blankImgData.rows, 0, GL_BGR,
-               GL_UNSIGNED_BYTE, blankImgData.ptr());
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, blankImgData.cols, blankImgData.rows,
+               0, GL_BGR, GL_UNSIGNED_BYTE, blankImgData.ptr());
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -24,9 +24,7 @@ void bindMatToTexture(const cv::Mat &image, GLuint textureId) {
                   GL_UNSIGNED_BYTE, image.ptr());
 }
 
-Vis::Vis() {
-  m_lastFrameTime = glfwGetTime();
-}
+Vis::Vis() { m_lastFrameTime = glfwGetTime(); }
 
 void Vis::loadNewestKeyframe(const odometry::KeyFrame &keyframe) {
   m_keyframeBuffer.push_back(keyframe);
@@ -44,7 +42,6 @@ void Vis::start() {
   rgbImageWindow->setLayout(
       new BoxLayout(Orientation::Horizontal, Alignment::Middle, 5, 5));
 
-  
   // Reserve some Textures for later images
   m_rgbLeftTexId = getTextureId();
   m_rgbRightTexId = getTextureId();
@@ -55,7 +52,6 @@ void Vis::start() {
 
   auto rgbRightView = new ImageView(rgbImageWindow, m_rgbRightTexId);
   rgbRightView->setFixedSize({300, 200});
-
 
   // To test layouting...
   auto imageWindow2 = new Window(screen, "RGB Right");
@@ -100,17 +96,15 @@ void Vis::start() {
     /******** </FPS> ********/
 
     // Draw buffered keyframes
-    for(odometry::KeyFrame &keyframe : m_keyframeBuffer) {
+    for (odometry::KeyFrame &keyframe : m_keyframeBuffer) {
       cv::Mat leftRGB = keyframe.GetLeftImg();
       cv::Mat rightRGB = keyframe.GetRightImg();
 
       bindMatToTexture(leftRGB, m_rgbLeftTexId);
       bindMatToTexture(rightRGB, m_rgbRightTexId);
 
-
       cv::Mat leftDepth = keyframe.GetLeftDep();
       cv::Mat leftValue = keyframe.GetLeftVal();
-
 
       odometry::Affine4f absolutePose = keyframe.GetAbsoPose();
 
@@ -118,7 +112,6 @@ void Vis::start() {
     }
 
     m_keyframeBuffer.clear();
-
   });
 
   screen->performLayout();

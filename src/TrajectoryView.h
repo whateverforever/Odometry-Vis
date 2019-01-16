@@ -16,9 +16,9 @@ class TrajectoryView : public nanogui::GLCanvas {
 public:
   TrajectoryView(Widget *parent) : nanogui::GLCanvas(parent) {
     using namespace nanogui;
-    
+
     m_positions = MatrixXf::Zero(3, 1);
-    m_cameraLines = MatrixXf::Zero(3,16);
+    m_cameraLines = MatrixXf::Zero(3, 16);
 
     m_trajShader.init(
         /* An identifying name */
@@ -68,26 +68,24 @@ public:
   ~TrajectoryView() {
     m_trajShader.free();
     m_camSymShader.free();
-}
+  }
 
   void setRotation(nanogui::Vector3f vRotation) { mRotation = vRotation; }
 
   std::unique_ptr<nanogui::Vector3f> getLastPoint() {
     return std::make_unique<nanogui::Vector3f>(
-        m_positions.col(m_positions.cols() - 1)
-        );
+        m_positions.col(m_positions.cols() - 1));
   }
 
   void addPose(odometry::Affine4f pose) {
-    nanogui::Matrix3f newRotation = pose.block<3,3>(0,0);
-    nanogui::Vector3f newPoint = pose.block<3,1>(0,3);
+    nanogui::Matrix3f newRotation = pose.block<3, 3>(0, 0);
+    nanogui::Vector3f newPoint = pose.block<3, 1>(0, 3);
 
     m_positions.conservativeResize(Eigen::NoChange, m_positions.cols() + 1);
     m_positions.col(m_positions.cols() - 1) = newPoint;
-    
+
     m_trajShader.bind();
     m_trajShader.uploadAttrib("position", m_positions);
-
 
     auto newCamVerts = nanogui::MatrixXf(3, 16);
     auto l = 0.35;
@@ -101,8 +99,9 @@ public:
     newCamVerts = newRotation * newCamVerts;
     newCamVerts.colwise() += newPoint;
 
-    m_cameraLines.conservativeResize(Eigen::NoChange, m_cameraLines.cols() + 16);
-    m_cameraLines.block<3,16>(0, m_cameraLines.cols()-16) = newCamVerts;
+    m_cameraLines.conservativeResize(Eigen::NoChange,
+                                     m_cameraLines.cols() + 16);
+    m_cameraLines.block<3, 16>(0, m_cameraLines.cols() - 16) = newCamVerts;
 
     m_camSymShader.bind();
     m_camSymShader.uploadAttrib("position", m_cameraLines);

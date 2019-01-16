@@ -10,23 +10,20 @@
 #include "Vis.h"
 
 int main(int /* argc */, char ** /* argv */) {
-  // Lib code!
   auto myUI = new Vis();
   auto dataGenerator = new DataGenerator();
 
-  // Simulates the threads from Liu & Yu
-  std::thread dataThread([dataGenerator, myUI](){
-    
+  std::thread dataThread([dataGenerator, myUI]() {
     while (true) {
-      // auto img_l, img_r = camera->getPicture();
-      // auto depth_l = stereo->getDepth(img_l, img_r);
+      // Getting the image from the camera, calculating the depth etc all happens here
+      // dataGenerator is basically the last link in the chain: Odometry
       auto latestKeyframe = dataGenerator->getLatestKeyframe();
 
       myUI->loadNewestKeyframe(latestKeyframe);
 
-      std::this_thread::sleep_for(std::chrono::milliseconds(3000)); // 30ms is ca 33fps
+      std::this_thread::sleep_for(
+          std::chrono::milliseconds(3000));
     }
-
   });
 
   myUI->start();

@@ -5,8 +5,7 @@
 #define PixelType CV_32F
 #endif
 
-namespace odometry
-{
+namespace odometry {
 typedef Eigen::Matrix<float, 1, 2> RowVector2f;
 typedef Eigen::Vector2i Vector2i;
 typedef Eigen::Vector4f Vector4f;
