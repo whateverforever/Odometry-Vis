@@ -5,60 +5,49 @@
 #include <nanogui/nanogui.h>
 #include <opencv2/opencv.hpp>
 
+#include "Keyframe.h"
 #include "Vis.h"
 
 class DataGenerator {
-public:
+ public:
   DataGenerator();
-  void updateValue();
+  odometry::KeyFrame updateValue();
   nanogui::Vector3f getLatestPoint();
-  friend class Vis;
 
-private:
-  int m_someValue;
-
-  std::vector<nanogui::Vector3f> m_trajectoryPoints;
-
-  cv::Mat *m_activeImage;
+ private:
   cv::Mat m_image_1;
   cv::Mat m_image_2;
 };
 
 DataGenerator::DataGenerator() {
-  m_someValue = 555;
-
   m_image_1 = cv::imread(
       "../data/rgbd_dataset_freiburg3_teddy/rgb/1341841873.273798.png",
-      CV_LOAD_IMAGE_COLOR); // Read the file
+      CV_LOAD_IMAGE_COLOR);  // Read the file
   m_image_2 = cv::imread(
       "../data/rgbd_dataset_freiburg3_teddy/rgb/1341841879.367159.png",
-      CV_LOAD_IMAGE_COLOR); // Read the file
-
-  m_activeImage = &m_image_1;
+      CV_LOAD_IMAGE_COLOR);  // Read the file
 }
 
 float RandomFloat(float a, float b) {
-    float random = ((float) rand()) / (float) RAND_MAX;
-    float diff = b - a;
-    float r = random * diff;
-    return a + r;
+  float random = ((float)rand()) / (float)RAND_MAX;
+  float diff = b - a;
+  float r = random * diff;
+  return a + r;
 }
 
-nanogui::Vector3f DataGenerator::getLatestPoint() {
-  return m_trajectoryPoints.back();
-}
+odometry::KeyFrame DataGenerator::updateValue() {
+  auto p_leftRGB = std::make_shared<cv::Mat>(m_image_1);
+  auto p_rightRGB = std::make_shared<cv::Mat>(m_image_2);
+  auto p_leftDepth = std::make_shared<cv::Mat>(m_image_1);
+  auto p_leftValue = std::make_shared<cv::Mat>(m_image_2);
+  // clang-format off
+  odometry::Affine4f origin;
+  origin << 0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0;
+  // clang-format on
 
-void DataGenerator::updateValue() {
-  m_someValue += 10;
-
-  m_trajectoryPoints.push_back(nanogui::Vector3f(
-    RandomFloat(-2,2),
-    RandomFloat(-2,2),
-    RandomFloat(-2,2)));
-
-  if (m_activeImage == &m_image_1) {
-    m_activeImage = &m_image_2;
-  } else {
-    m_activeImage = &m_image_1;
-  }
+  auto kframe = odometry::KeyFrame(p_leftRGB, p_rightRGB, p_leftDepth,
+                                   p_leftValue, origin);
 }
