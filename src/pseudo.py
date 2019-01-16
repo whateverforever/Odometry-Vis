@@ -1,11 +1,13 @@
 # pylint: skip-file
 
+""" ################################# C++/Python mixture, pseudocode ################################# """
+
 # background thread
 def ComputeThread(frame_done_callback):
     while True:
         img_l, img_r = camera.GetImages()
         depth = stereo.ComputeDepth(img_l, img_r)
-        rel_pose = odometry.ComputeCameraPos(img_l, img_last, depth)
+        KFrame = odometry.ComputeCameraPos(img_l, img_last, depth)
 
         frame_done_callback(KFrame)
 

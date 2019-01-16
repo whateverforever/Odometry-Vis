@@ -9,25 +9,30 @@
 
 #include "Vis.h"
 
-void updateData(DataGenerator *dataGen) {
-  while (true) {
-    dataGen->updateValue();
-    std::this_thread::sleep_for(std::chrono::milliseconds(30)); // 30ms is ca 33fps
-  }
-}
-
 int main(int /* argc */, char ** /* argv */) {
   // Lib code!
-  auto visu = new Vis();
+  auto myUI = new Vis();
   auto dataGenerator = new DataGenerator();
 
-  visu->setDataSource(dataGenerator);
+  myUI->setDataSource(dataGenerator);
 
   // Simulates the threads from Liu & Yu
-  std::thread dataThread(updateData, std::ref(dataGenerator));
+  std::thread dataThread([dataGenerator, myUI](){
+    
+    while (true) {
+      dataGenerator->updateValue();
 
-  visu->initUI();
-  visu->startUI();
+      auto latestPoint = dataGenerator->getLatestPoint();
+
+      myUI->addTrajectoryPoint(latestPoint);
+
+      std::this_thread::sleep_for(std::chrono::milliseconds(30)); // 30ms is ca 33fps
+    }
+
+  });
+
+  myUI->initUI();
+  myUI->startUI();
 
   dataThread.join();
 
