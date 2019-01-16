@@ -16,6 +16,7 @@ public:
     using namespace nanogui;
     
     m_positions = MatrixXf(3, 4);
+    m_cameraLines = MatrixXf(0,0);
 
     m_trajShader.init(
         /* An identifying name */
@@ -75,24 +76,32 @@ public:
         );
   }
 
-  void addPoint(nanogui::Vector3f newPoint) {
+  void addPose(odometry::Affine4f pose) {
+    nanogui::Vector3f newPoint = pose.block<3,1>(0,3);
+
     m_positions.conservativeResize(Eigen::NoChange, m_positions.cols() + 1);
     m_positions.col(m_positions.cols() - 1) = newPoint;
     
     m_trajShader.bind();
     m_trajShader.uploadAttrib("position", m_positions);
 
-    auto cameraLines = nanogui::MatrixXf(3, 16);
+
+    auto newCameraLines = nanogui::MatrixXf(3, 16);
     auto l = 1;
 
     // clang-format off
-    cameraLines <<  0,   l,   0,   l,   0,  -l,   0,  -l,   l,   l,   l,  -l,  -l,  -l,  -l,   l, 
-                    0, 2*l,   0, 2*l,   0, 2*l,   0, 2*l, 2*l, 2*l, 2*l, 2*l, 2*l, 2*l, 2*l, 2*l,
-                    0,  -l,   0,   l,   0,  -l,   0,   l,  -l,   l,  -l,  -l,  -l,   l,   l,   l;
+    newCameraLines <<  0,   l,   0,   l,   0,  -l,   0,  -l,   l,   l,   l,  -l,  -l,  -l,  -l,   l, 
+                       0, 2*l,   0, 2*l,   0, 2*l,   0, 2*l, 2*l, 2*l, 2*l, 2*l, 2*l, 2*l, 2*l, 2*l,
+                       0,  -l,   0,   l,   0,  -l,   0,   l,  -l,   l,  -l,  -l,  -l,   l,   l,   l;
     // clang-format on
 
+    newCameraLines.colwise() += newPoint;
+
+    m_cameraLines.conservativeResize(Eigen::NoChange, m_cameraLines.cols() + 16);
+    m_cameraLines.block<3,16>(0, m_cameraLines.cols()-16) = newCameraLines;
+
     m_camSymShader.bind();
-    m_camSymShader.uploadAttrib("position", cameraLines);
+    m_camSymShader.uploadAttrib("position", m_cameraLines);
   }
 
   virtual void drawGL() override {
@@ -125,13 +134,15 @@ public:
     m_camSymShader.bind();
     m_camSymShader.setUniform("modelViewProj", mvp);
 
-    m_camSymShader.drawArray(GL_LINE_STRIP, 0, m_positions.cols() - 1);
+    m_camSymShader.drawArray(GL_LINE_STRIP, 0, m_cameraLines.cols());
     
     glDisable(GL_DEPTH_TEST);
   }
 
 private:
   nanogui::MatrixXf m_positions;
+  nanogui::MatrixXf m_cameraLines;
+
   nanogui::GLShader m_trajShader;
   nanogui::GLShader m_camSymShader;
   Eigen::Vector3f mRotation;

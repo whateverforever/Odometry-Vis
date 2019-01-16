@@ -75,15 +75,15 @@ void Vis::start() {
                                                   (rand() % 100) / 100.0f));
   });
 
-  Button *b2 = new Button(imageWindow2, "Add new point");
-  b2->setCallback([trajectoryView]() {
+  // Button *b2 = new Button(imageWindow2, "Add new point");
+  // b2->setCallback([trajectoryView]() {
 
-    auto newPoint = nanogui::Vector3f(
-        (rand() % 100) / 100.0f * 2 - 1, (rand() % 100) / 100.0f * 2 - 1,
-        (rand() % 100) / 100.0f * 2 - 1);
+  //   auto newPoint = nanogui::Vector3f(
+  //       (rand() % 100) / 100.0f * 2 - 1, (rand() % 100) / 100.0f * 2 - 1,
+  //       (rand() % 100) / 100.0f * 2 - 1);
 
-    trajectoryView->addPoint(newPoint);
-  });
+  //   trajectoryView->addPoint(newPoint);
+  // });
 
   // Use redraw to reload images & points from data sources
   screen->onUpdate([this, trajectoryView]() {
@@ -113,9 +113,8 @@ void Vis::start() {
 
 
       odometry::Affine4f absolutePose = keyframe.GetAbsoPose();
-      nanogui::Vector3f absolutePosition = absolutePose.block<3,1>(0,3);
 
-      m_view->addPoint(absolutePosition);
+      m_view->addPose(absolutePose);
     }
 
     m_keyframeBuffer.clear();
