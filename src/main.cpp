@@ -18,13 +18,17 @@ int main(int /* argc */, char ** /* argv */) {
   std::thread dataThread([dataGenerator, myUI](){
     
     while (true) {
-      dataGenerator->updateValue();
+      // img_l, img_r = camera->getPicture();
+      // depth_l = stereo->getDepth(img_l, img_r);
 
-      auto latestPoint = dataGenerator->getLatestPoint();
+      auto latestKeyframe = dataGenerator->updateValue();
 
-      myUI->addTrajectoryPoint(latestPoint);
+      // auto latestCamPose = latestKeyframe.GetAbsoPose();
+      // auto latestCamPosition = latestCamPose.block<3,1>(0,3);
+      // auto latestPoint = dataGenerator->getLatestPoint();
+      // myUI->addTrajectoryPoint(latestPoint);
 
-      std::this_thread::sleep_for(std::chrono::milliseconds(30)); // 30ms is ca 33fps
+      std::this_thread::sleep_for(std::chrono::milliseconds(300)); // 30ms is ca 33fps
     }
 
   });
