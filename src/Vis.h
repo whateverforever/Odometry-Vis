@@ -21,6 +21,7 @@ public:
   void initUI();
   void startUI();
   void addTrajectoryPoint(nanogui::Vector3f);
+  void loadNewestKeyframe(const odometry::KeyFrame &);
   void someFunc();
 
 private:
@@ -30,5 +31,6 @@ private:
 
   std::map<std::string, cv::Mat> m_frames;
   std::vector<nanogui::Vector3f> m_pointBuffer;
+  std::vector<odometry::KeyFrame> m_keyframeBuffer;
   TrajectoryView *m_view;
 };

@@ -30,6 +30,10 @@ void Vis::addTrajectoryPoint(nanogui::Vector3f point) {
   // m_view->addPoint(point);
 }
 
+void Vis::loadNewestKeyframe(const odometry::KeyFrame &keyframe) {
+  m_keyframeBuffer.push_back(keyframe);
+}
+
 void Vis::initUI() {
   using namespace nanogui;
 
@@ -80,7 +84,7 @@ void Vis::initUI() {
 
   // Use redraw to reload images & points from data sources
   screen->onUpdate([this, rgbLeftTexId, trajectoryView]() {
-    /******** FPS ********/
+    /******** <FPS> ********/
     double currentTime = glfwGetTime();
     if (currentTime - m_lastFrameTime >= 1.0) {
       m_fps = m_numElapsedFrames;
@@ -90,7 +94,7 @@ void Vis::initUI() {
       std::cout << "FPS: " << m_fps << std::endl;
     }
     m_numElapsedFrames += 1;
-    /******** /FPS ********/
+    /******** </FPS> ********/
 
     // Load new images
     // cv::Mat newImg = *m_dataSource->m_activeImage;
@@ -99,12 +103,13 @@ void Vis::initUI() {
     // glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, newImg.cols, newImg.rows, GL_BGR,
     //                 GL_UNSIGNED_BYTE, newImg.ptr());
 
-    // Load new trajectory points
-    for(const nanogui::Vector3f &vec : m_pointBuffer) {
-      m_view->addPoint(vec);
+    // Load buffered keyframes
+    for(const odometry::KeyFrame &keyframe : m_keyframeBuffer) {
+      std::cout << "Processing new keyframe" << std::endl;
     }
 
-    m_pointBuffer.clear();
+    m_keyframeBuffer.clear();
+
   });
 
   screen->performLayout();
