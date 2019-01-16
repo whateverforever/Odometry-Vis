@@ -16,7 +16,7 @@ public:
     using namespace nanogui;
     
     m_positions = MatrixXf(3, 4);
-    m_cameraLines = MatrixXf(0,0);
+    m_cameraLines = MatrixXf::Zero(3,16);
 
     m_trajShader.init(
         /* An identifying name */
@@ -86,19 +86,19 @@ public:
     m_trajShader.uploadAttrib("position", m_positions);
 
 
-    auto newCameraLines = nanogui::MatrixXf(3, 16);
+    auto newCamVerts = nanogui::MatrixXf(3, 16);
     auto l = 1;
 
     // clang-format off
-    newCameraLines <<  0,   l,   0,   l,   0,  -l,   0,  -l,   l,   l,   l,  -l,  -l,  -l,  -l,   l, 
-                       0, 2*l,   0, 2*l,   0, 2*l,   0, 2*l, 2*l, 2*l, 2*l, 2*l, 2*l, 2*l, 2*l, 2*l,
-                       0,  -l,   0,   l,   0,  -l,   0,   l,  -l,   l,  -l,  -l,  -l,   l,   l,   l;
+    newCamVerts <<  0,   l,   0,   l,   0,  -l,   0,  -l,   l,   l,   l,  -l,  -l,  -l,  -l,   l, 
+                    0, 2*l,   0, 2*l,   0, 2*l,   0, 2*l, 2*l, 2*l, 2*l, 2*l, 2*l, 2*l, 2*l, 2*l,
+                    0,  -l,   0,   l,   0,  -l,   0,   l,  -l,   l,  -l,  -l,  -l,   l,   l,   l;
     // clang-format on
 
-    newCameraLines.colwise() += newPoint;
+    newCamVerts.colwise() += newPoint;
 
     m_cameraLines.conservativeResize(Eigen::NoChange, m_cameraLines.cols() + 16);
-    m_cameraLines.block<3,16>(0, m_cameraLines.cols()-16) = newCameraLines;
+    m_cameraLines.block<3,16>(0, m_cameraLines.cols()-16) = newCamVerts;
 
     m_camSymShader.bind();
     m_camSymShader.uploadAttrib("position", m_cameraLines);
