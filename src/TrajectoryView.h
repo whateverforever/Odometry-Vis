@@ -59,11 +59,15 @@ public:
   }
 
   void addPoint(nanogui::Vector3f newPoint) {
+    std::cout << "ewöfsdfas" << std::endl;
     m_positions.conservativeResize(Eigen::NoChange, m_positions.cols() + 1);
+    std::cout << "ewöfsdfas999" << std::endl;
     m_positions.col(m_positions.cols() - 1) = newPoint;
-
+    std::cout << "asdf" << std::endl;
     mShader.bind();
+    std::cout << "asdf23" << std::endl;
     mShader.uploadAttrib("position", m_positions);
+    std::cout << "a345sdf" << std::endl;
   }
 
   virtual void drawGL() override {

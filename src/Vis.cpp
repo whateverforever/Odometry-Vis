@@ -29,6 +29,13 @@ void Vis::setDataSource(DataGenerator *source) {
   std::cout << "m_someValue: " << source->m_someValue << std::endl;
 }
 
+void Vis::addTrajectoryPoint(nanogui::Vector3f point) {
+  std::cout << "lel" << std::endl;
+  m_pointBuffer.push_back(point);
+
+  // m_view->addPoint(point);
+}
+
 void Vis::initUI() {
   using namespace nanogui;
 
@@ -107,7 +114,7 @@ void Vis::initUI() {
       return;
     }
 
-    trajectoryView->addPoint(latestSrcPoint);
+    m_view->addPoint(latestSrcPoint);
   });
 
   screen->performLayout();
