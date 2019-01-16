@@ -118,21 +118,19 @@ public:
     mvp.setIdentity();
     mvp.topLeftCorner<3, 3>() =
         Eigen::Matrix3f(
-            Eigen::AngleAxisf(mRotation[0] * fTime, Vector3f::UnitX()) *
-            Eigen::AngleAxisf(mRotation[1] * fTime, Vector3f::UnitY()) *
-            Eigen::AngleAxisf(mRotation[2] * fTime, Vector3f::UnitZ())) *
+            Eigen::AngleAxisf(mRotation[0] * 0.5 * fTime, Vector3f::UnitX()) *
+            Eigen::AngleAxisf(mRotation[1] * 0.5 * fTime, Vector3f::UnitY()) *
+            Eigen::AngleAxisf(mRotation[2] * 0.5 * fTime, Vector3f::UnitZ())) *
         0.25f;
 
     m_trajShader.bind();
     m_trajShader.setUniform("modelViewProj", mvp);
-
     m_trajShader.drawArray(GL_LINE_STRIP, 0, m_positions.cols());
 
     m_camSymShader.bind();
     m_camSymShader.setUniform("modelViewProj", mvp);
-
     m_camSymShader.drawArray(GL_LINES, 0, m_cameraLines.cols());
-    
+
     glDisable(GL_DEPTH_TEST);
   }
 
