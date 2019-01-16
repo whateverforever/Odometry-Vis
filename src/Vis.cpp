@@ -104,17 +104,11 @@ void Vis::initUI() {
                     GL_UNSIGNED_BYTE, newImg.ptr());
 
     // Load new trajectory points
-    nanogui::Vector3f latestSrcPoint = m_dataSource->getLatestPoint();
-    
-    std::unique_ptr<nanogui::Vector3f> lastDisplayedPoint = trajectoryView->getLastPoint();
-
-    auto diffToLastPoint = *lastDisplayedPoint - latestSrcPoint;
-
-    if(diffToLastPoint.isMuchSmallerThan(0.01)) {
-      return;
+    for(const nanogui::Vector3f &vec : m_pointBuffer) {
+      m_view->addPoint(vec);
     }
 
-    m_view->addPoint(latestSrcPoint);
+    m_pointBuffer.clear();
   });
 
   screen->performLayout();
