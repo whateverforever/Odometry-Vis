@@ -101,13 +101,21 @@ void Vis::start() {
 
     // Draw buffered keyframes
     for(odometry::KeyFrame &keyframe : m_keyframeBuffer) {
-      std::cout << "Processing new keyframe" << std::endl;
-
-      auto leftRGB = keyframe.GetLeftImg();
-      auto rightRGB = keyframe.GetRightImg();
+      cv::Mat leftRGB = keyframe.GetLeftImg();
+      cv::Mat rightRGB = keyframe.GetRightImg();
 
       bindMatToTexture(leftRGB, m_rgbLeftTexId);
       bindMatToTexture(rightRGB, m_rgbRightTexId);
+
+
+      cv::Mat leftDepth = keyframe.GetLeftDep();
+      cv::Mat leftValue = keyframe.GetLeftVal();
+
+
+      odometry::Affine4f absolutePose = keyframe.GetAbsoPose();
+      nanogui::Vector3f absolutePosition = absolutePose.block<3,1>(0,3);
+
+      m_view->addPoint(absolutePosition);
     }
 
     m_keyframeBuffer.clear();
