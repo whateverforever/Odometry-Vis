@@ -41,9 +41,9 @@ odometry::KeyFrame DataGenerator::getLatestKeyframe() {
   auto p_leftValue = std::make_shared<cv::Mat>(m_image_2);
   // clang-format off
   odometry::Affine4f origin;
-  origin << 0, 0, 0, RandomFloat(-2,4),
-            0, 0, 0, RandomFloat(-2,4),
-            0, 0, 0, RandomFloat(-2,4),
+  origin << 1, 0, 0, RandomFloat(-2,4),
+            0, 1, 0, RandomFloat(-2,4),
+            0, 0, 1, RandomFloat(-2,4),
             0, 0, 0, 1;
   // clang-format on
 

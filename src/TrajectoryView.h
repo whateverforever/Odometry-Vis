@@ -97,6 +97,7 @@ public:
     // clang-format on
 
     newCamVerts.colwise() += newPoint;
+    newCamVerts = newRotation * newCamVerts;
 
     m_cameraLines.conservativeResize(Eigen::NoChange, m_cameraLines.cols() + 16);
     m_cameraLines.block<3,16>(0, m_cameraLines.cols()-16) = newCamVerts;
