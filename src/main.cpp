@@ -24,7 +24,7 @@ int main(int /* argc */, char ** /* argv */) {
 
       myUI->loadNewestKeyframe(latestKeyframe);
 
-      std::this_thread::sleep_for(std::chrono::milliseconds(300)); // 30ms is ca 33fps
+      std::this_thread::sleep_for(std::chrono::milliseconds(3000)); // 30ms is ca 33fps
     }
 
   });

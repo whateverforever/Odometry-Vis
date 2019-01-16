@@ -15,7 +15,7 @@ public:
   TrajectoryView(Widget *parent) : nanogui::GLCanvas(parent) {
     using namespace nanogui;
     
-    m_positions = MatrixXf(3, 4);
+    m_positions = MatrixXf::Zero(3, 4);
     m_cameraLines = MatrixXf::Zero(3,16);
 
     m_trajShader.init(
@@ -77,6 +77,7 @@ public:
   }
 
   void addPose(odometry::Affine4f pose) {
+    nanogui::Matrix3f newRotation = pose.block<3,3>(0,0);
     nanogui::Vector3f newPoint = pose.block<3,1>(0,3);
 
     m_positions.conservativeResize(Eigen::NoChange, m_positions.cols() + 1);
@@ -87,7 +88,7 @@ public:
 
 
     auto newCamVerts = nanogui::MatrixXf(3, 16);
-    auto l = 1;
+    auto l = 0.4;
 
     // clang-format off
     newCamVerts <<  0,   l,   0,   l,   0,  -l,   0,  -l,   l,   l,   l,  -l,  -l,  -l,  -l,   l, 
@@ -122,14 +123,7 @@ public:
     m_trajShader.bind();
     m_trajShader.setUniform("modelViewProj", mvp);
 
-    m_trajShader.drawArray(GL_LINE_STRIP, 0, m_positions.cols() - 1);
-
-    mvp.topLeftCorner<3, 3>() =
-        Eigen::Matrix3f(
-            Eigen::AngleAxisf(mRotation[0] * fTime, Vector3f::UnitX()) *
-            Eigen::AngleAxisf(mRotation[1] * fTime, Vector3f::UnitY()) *
-            Eigen::AngleAxisf(mRotation[2] * fTime, Vector3f::UnitZ())) *
-        0.25f;
+    m_trajShader.drawArray(GL_LINE_STRIP, 0, m_positions.cols());
 
     m_camSymShader.bind();
     m_camSymShader.setUniform("modelViewProj", mvp);
