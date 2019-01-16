@@ -14,6 +14,8 @@ class TrajectoryView : public nanogui::GLCanvas {
 public:
   TrajectoryView(Widget *parent) : nanogui::GLCanvas(parent) {
     using namespace nanogui;
+    
+    m_positions = MatrixXf(3, 4);
 
     m_trajShader.init(
         /* An identifying name */
@@ -37,16 +39,6 @@ public:
         "    color = frag_color;\n"
         "}");
 
-    m_positions = MatrixXf(3, 4);
-
-    m_positions.col(0) << -1, 1, 1;
-    m_positions.col(1) << -1, 1, -1;
-    m_positions.col(2) << 1, 1, -1;
-    m_positions.col(3) << 1, 1, 1;
-
-    m_trajShader.bind();
-    m_trajShader.uploadAttrib("position", m_positions);
-
     m_camSymShader.init(
         /* An identifying name */
         "camera_symbol_shader",
@@ -68,9 +60,6 @@ public:
         "void main() {\n"
         "    color = frag_color;\n"
         "}");
-
-    m_camSymShader.bind();
-    m_camSymShader.uploadAttrib("position", m_positions);
   }
 
   ~TrajectoryView() {
