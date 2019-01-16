@@ -49,4 +49,5 @@ odometry::KeyFrame DataGenerator::getLatestKeyframe() {
 
   auto kframe = odometry::KeyFrame(p_leftRGB, p_rightRGB, p_leftDepth,
                                    p_leftValue, origin);
+  return kframe;
 }

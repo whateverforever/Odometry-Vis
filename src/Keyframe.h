@@ -29,7 +29,7 @@ class KeyFrame {
     ~ KeyFrame();
 
     // disable copy constructor
-    KeyFrame(const KeyFrame& ) = delete;
+    // KeyFrame(const KeyFrame& ) = delete;
 
     // disable copy assignment
     KeyFrame& operator= ( const KeyFrame & ) = delete;
