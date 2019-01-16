@@ -18,8 +18,7 @@
 class Vis {
 public:
   Vis();
-  void initUI();
-  void startUI();
+  void start();
   void addTrajectoryPoint(nanogui::Vector3f);
   void loadNewestKeyframe(const odometry::KeyFrame &);
   void someFunc();

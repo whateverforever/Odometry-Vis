@@ -34,7 +34,7 @@ void Vis::loadNewestKeyframe(const odometry::KeyFrame &keyframe) {
   m_keyframeBuffer.push_back(keyframe);
 }
 
-void Vis::initUI() {
+void Vis::start() {
   using namespace nanogui;
 
   nanogui::init();
@@ -115,9 +115,7 @@ void Vis::initUI() {
   screen->performLayout();
   screen->drawAll();
   screen->setVisible(true);
-}
 
-void Vis::startUI() {
   nanogui::mainloop(30);
   nanogui::shutdown();
 }

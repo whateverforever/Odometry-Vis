@@ -34,8 +34,7 @@ int main(int /* argc */, char ** /* argv */) {
 
   });
 
-  myUI->initUI();
-  myUI->startUI();
+  myUI->start();
 
   dataThread.join();
 
