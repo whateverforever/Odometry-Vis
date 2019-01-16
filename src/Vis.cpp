@@ -16,9 +16,15 @@ GLuint getTextureForMat(cv::Mat &mat) {
   return imageTexId;
 }
 
+GLuint getTextureId() {
+  GLuint imageTexId;
+  glGenTextures(1, &imageTexId);
+
+  return imageTexId;
+}
+
 Vis::Vis() {
   m_frames["rgb_l"] = cv::Mat::zeros(480, 640, CV_8UC3);
-  std::cout << "This: " << this << std::endl;
 
   m_lastFrameTime = glfwGetTime();
 }
@@ -45,6 +51,10 @@ void Vis::start() {
   auto rgbImageWindow = new Window(screen, "RGB");
   rgbImageWindow->setLayout(
       new BoxLayout(Orientation::Horizontal, Alignment::Middle, 5, 5));
+
+  m_rgbLeftTexId = getTextureId();
+  m_rgbRightTexId = getTextureId();
+  m_depthLeftTexId = getTextureId();
 
   GLuint rgbLeftTexId = getTextureForMat(m_frames["rgb_l"]);
 
@@ -96,14 +106,7 @@ void Vis::start() {
     m_numElapsedFrames += 1;
     /******** </FPS> ********/
 
-    // Load new images
-    // cv::Mat newImg = *m_dataSource->m_activeImage;
-
-    // glBindTexture(GL_TEXTURE_2D, rgbLeftTexId);
-    // glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, newImg.cols, newImg.rows, GL_BGR,
-    //                 GL_UNSIGNED_BYTE, newImg.ptr());
-
-    // Load buffered keyframes
+    // Draw buffered keyframes
     for(odometry::KeyFrame &keyframe : m_keyframeBuffer) {
       std::cout << "Processing new keyframe" << std::endl;
 

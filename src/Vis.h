@@ -27,6 +27,9 @@ private:
   double m_lastFrameTime;
   int m_numElapsedFrames;
   double m_fps;
+  GLuint m_rgbLeftTexId;
+  GLuint m_rgbRightTexId;
+  GLuint m_depthLeftTexId;
 
   std::map<std::string, cv::Mat> m_frames;
   std::vector<nanogui::Vector3f> m_pointBuffer;
