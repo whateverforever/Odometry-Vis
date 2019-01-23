@@ -17,4 +17,10 @@ find_package(OpenCV REQUIRED)
 include_directories(${OPENCV_INCLUDE_DIR})
 
 # My Lib
-add_subdirectory(src)
+include_directories(include)
+
+add_library(${APP_LIB} STATIC src/Vis.cpp src/VisScreen.cpp src/Keyframe.cpp)
+add_executable(${APP_EXE} src/main.cpp)
+
+target_link_libraries(${APP_LIB} nanogui opencv_imgcodecs)
+target_link_libraries(${APP_EXE} ${APP_LIB})
