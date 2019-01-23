@@ -8,7 +8,6 @@
 #include <Eigen/Geometry>
 
 #include "Keyframe.h"
-#include "Vis.h"
 
 class DataGenerator {
 public:
