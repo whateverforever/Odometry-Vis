@@ -1,4 +1,6 @@
-add_library(${APP_LIB} TrajectoryView.h Vis.cpp Vis.h VisScreen.cpp VisScreen.h Keyframe.h Keyframe.cpp)
+include_directories(../include)
+
+add_library(${APP_LIB} Vis.cpp VisScreen.cpp Keyframe.cpp)
 add_executable(${APP_EXE} main.cpp)
 
 target_link_libraries(${APP_LIB} nanogui opencv_core opencv_highgui opencv_features2d opencv_imgcodecs)

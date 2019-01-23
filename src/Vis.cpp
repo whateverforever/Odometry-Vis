@@ -1,4 +1,4 @@
-#include "Vis.h"
+#include <Vis.h>
 
 GLuint getTextureId() {
   GLuint imageTexId;
