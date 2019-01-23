@@ -7,7 +7,8 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/opencv.hpp>
 
-#include "Vis.h"
+#include <Vis.h>
+#include <DataGen.h>
 
 int main(int /* argc */, char ** /* argv */) {
   auto myUI = new Vis();

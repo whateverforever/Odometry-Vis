@@ -11,7 +11,8 @@
 #include <nanogui/imageview.h>
 #include <nanogui/nanogui.h>
 
-#include "DataGen.h"
+#include <Keyframe.h>
+
 #include "TrajectoryView.h"
 #include "VisScreen.h"
 
