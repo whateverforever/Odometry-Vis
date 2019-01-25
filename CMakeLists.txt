@@ -8,8 +8,6 @@ set(CMAKE_CXX_FLAGS "-O3")
 
 # Nanogui
 add_subdirectory(lib/nanogui)
-include_directories(lib/nanogui/include)
-include_directories(${NANOGUI_EXTRA_INCS})
 add_definitions(${NANOGUI_EXTRA_DEFS})
 
 # OpenCV
@@ -19,8 +17,17 @@ include_directories(${OPENCV_INCLUDE_DIR})
 # My Lib
 include_directories(include)
 
-add_library(${APP_LIB} STATIC src/Vis.cpp src/VisScreen.cpp src/Keyframe.cpp)
+add_library(${APP_LIB} STATIC
+    src/Vis.cpp
+    src/VisScreen.cpp
+    src/Keyframe.cpp
+    src/DataGen.cpp
+    )
 add_executable(${APP_EXE} src/main.cpp)
 
-target_link_libraries(${APP_LIB} nanogui opencv_imgcodecs)
+target_link_libraries(${APP_LIB} nanogui ${NANOGUI_EXTRA_LIBS} opencv_imgcodecs)
 target_link_libraries(${APP_EXE} ${APP_LIB})
+
+# Absolutely needed for the parent not to forget nanogui, eigen, etc...
+target_include_directories(${APP_LIB} PUBLIC lib/nanogui/include)
+target_include_directories(${APP_LIB} PUBLIC ${NANOGUI_EXTRA_INCS})
