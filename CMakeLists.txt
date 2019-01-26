@@ -7,12 +7,12 @@ set(APP_LIB Visualization)
 set(CMAKE_CXX_FLAGS "-O3")
 
 # Nanogui
-add_subdirectory(lib/nanogui)
-add_definitions(${NANOGUI_EXTRA_DEFS})
-
 set(NANOGUI_BUILD_EXAMPLE OFF)
 set(NANOGUI_BUILD_PYTHON OFF)
 set(NANOGUI_INSTALL OFF)
+
+add_subdirectory(lib/nanogui)
+add_definitions(${NANOGUI_EXTRA_DEFS})
 
 # OpenCV
 find_package(OpenCV REQUIRED)
