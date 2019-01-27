@@ -71,7 +71,7 @@ public:
     auto shaders = std::vector<nanogui::GLShader>{m_trajShader, m_camSymShader};
 
     // focal length
-    float f = 1.0;
+    float f = 5.0;
     int width, height;
 
     width = this->width();
@@ -82,13 +82,26 @@ public:
       height = this->fixedHeight();
     }
 
+    float near = 0.1;
+    float far = 10;
+
+    float left = -1;
+    float right = 1;
+
+    float top = 1;
+    float bottom = -1;
+
     // clang-format off
-    Matrix4f projMatrix;
-    projMatrix <<   f, 0, width/2, 0,
-                    0, f, height/2, 0,
-                    0, 0, 1, 0,
-                    0, 0, 0, 1;
+    Matrix4f projMatrix = Matrix4f::Identity();
+    /*
+    projMatrix <<   near/right, 0,          0,                          0,
+                    0,          near/top,   0,                          0,
+                    0,          0,          -(far + near)/(far-near),   -2*far*near/(far-near),
+                    0,          0,          -1,                         0;
+    */
     // clang-format on
+
+    projMatrix *= 2;
 
     for (auto shader : shaders) {
       shader.bind();
@@ -101,7 +114,7 @@ public:
     m_camSymShader.free();
   }
 
-  void setRotation(nanogui::Vector3f vRotation) { mRotation = vRotation; }
+  void setRotation(nanogui::Vector3f vRotation) { m_Rotation = vRotation; }
 
   std::unique_ptr<nanogui::Vector3f> getLastPoint() {
     return std::make_unique<nanogui::Vector3f>(
@@ -148,13 +161,13 @@ public:
     mvp.setIdentity();
     mvp.topLeftCorner<3, 3>() =
         Eigen::Matrix3f(
-            Eigen::AngleAxisf(mRotation[0] * 0.5 * fTime, Vector3f::UnitX()) *
-            Eigen::AngleAxisf(mRotation[1] * 0.5 * fTime, Vector3f::UnitY()) *
-            Eigen::AngleAxisf(mRotation[2] * 0.5 * fTime, Vector3f::UnitZ())) *
+            Eigen::AngleAxisf(m_Rotation[0] * 0.5 * fTime, Vector3f::UnitX()) *
+            Eigen::AngleAxisf(m_Rotation[1] * 0.5 * fTime, Vector3f::UnitY()) *
+            Eigen::AngleAxisf(m_Rotation[2] * 0.5 * fTime, Vector3f::UnitZ())) *
         0.25f;
 
     Matrix4f viewMatrix = Matrix4f::Identity();
-    // viewMatrix.block<3, 1>(0, 3) = Eigen::Vector3f(0, 0, -0.5);
+    viewMatrix.block<3, 1>(0, 3) = Eigen::Vector3f(0, 0, -2);
 
     m_trajShader.bind();
     m_trajShader.setUniform("modelMatrix", mvp);
@@ -174,5 +187,5 @@ private:
 
   nanogui::GLShader m_trajShader;
   nanogui::GLShader m_camSymShader;
-  Eigen::Vector3f mRotation;
+  Eigen::Vector3f m_Rotation;
 };
