@@ -26,12 +26,14 @@ public:
 
         /* Vertex shader */
         "#version 330\n"
-        "uniform mat4 modelViewProj;\n"
+        "uniform mat4 modelMatrix;\n"
+        "uniform mat4 viewMatrix;\n"
+        "uniform mat4 projMatrix;\n"
         "in vec3 position;\n"
         "out vec4 frag_color;\n"
         "void main() {\n"
         "    frag_color = vec4(0.7, 0.7, 0.7, 1.0);\n"
-        "    gl_Position = modelViewProj * vec4(position, 1.0);\n"
+        "    gl_Position = projMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);\n"
         "}",
 
         /* Fragment shader */
@@ -48,12 +50,12 @@ public:
 
         /* Vertex shader */
         "#version 330\n"
-        "uniform mat4 modelViewProj;\n"
+        "uniform mat4 modelMatrix;\n"
         "in vec3 position;\n"
         "out vec4 frag_color;\n"
         "void main() {\n"
         "    frag_color = vec4(1.0, 1.0, 1.0, 1.0);\n"
-        "    gl_Position = modelViewProj * vec4(position, 1.0);\n"
+        "    gl_Position = modelMatrix * vec4(position, 1.0);\n"
         "}",
 
         /* Fragment shader */
@@ -63,6 +65,11 @@ public:
         "void main() {\n"
         "    color = frag_color;\n"
         "}");
+
+        Matrix4f projMatrix = Matrix4f::Identity();
+
+        m_trajShader.bind();
+        m_trajShader.setUniform("projMatrix", projMatrix);
   }
 
   ~TrajectoryView() {
@@ -91,7 +98,7 @@ public:
     auto l = 0.35;
 
     // clang-format off
-    newCamVerts <<  0,   l,   0,   l,   0,  -l,   0,  -l,   l,   l,   l,  -l,  -l,  -l,  -l,   l, 
+    newCamVerts <<  0,   l,   0,   l,   0,  -l,   0,  -l,   l,   l,   l,  -l,  -l,  -l,  -l,   l,
                     0, 2*l,   0, 2*l,   0, 2*l,   0, 2*l, 2*l, 2*l, 2*l, 2*l, 2*l, 2*l, 2*l, 2*l,
                     0,  -l,   0,   l,   0,  -l,   0,   l,  -l,   l,  -l,  -l,  -l,   l,   l,   l;
     // clang-format on
@@ -122,12 +129,16 @@ public:
             Eigen::AngleAxisf(mRotation[2] * 0.5 * fTime, Vector3f::UnitZ())) *
         0.25f;
 
+    Matrix4f viewMatrix = Matrix4f::Identity();
+    viewMatrix.block<3,1>(0,3) = Eigen::Vector3f(0,0,-0.5);
+
     m_trajShader.bind();
-    m_trajShader.setUniform("modelViewProj", mvp);
+    m_trajShader.setUniform("modelMatrix", mvp);
+    m_trajShader.setUniform("viewMatrix", viewMatrix);
     m_trajShader.drawArray(GL_LINE_STRIP, 0, m_positions.cols());
 
     m_camSymShader.bind();
-    m_camSymShader.setUniform("modelViewProj", mvp);
+    m_camSymShader.setUniform("modelMatrix", mvp);
     m_camSymShader.drawArray(GL_LINES, 0, m_cameraLines.cols());
 
     glDisable(GL_DEPTH_TEST);
