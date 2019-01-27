@@ -52,11 +52,12 @@ public:
         /* Vertex shader */
         "#version 330\n"
         "uniform mat4 modelMatrix;\n"
+        "uniform mat4 projMatrix;\n"
         "in vec3 position;\n"
         "out vec4 frag_color;\n"
         "void main() {\n"
         "    frag_color = vec4(1.0, 1.0, 1.0, 1.0);\n"
-        "    gl_Position = modelMatrix * vec4(position, 1.0);\n"
+        "    gl_Position = projMatrix * modelMatrix * vec4(position, 1.0);\n"
         "}",
 
         /* Fragment shader */
@@ -81,13 +82,12 @@ public:
       height = this->fixedHeight();
     }
 
-    std::cout << "GL Context is " << width << "x" << height << std::endl;
-
     // clang-format off
-        Matrix4f projMatrix;
-        projMatrix <<   f, 0, width/2,
-                        0, f, height/2,
-                        0, 0, 1;
+    Matrix4f projMatrix;
+    projMatrix <<   f, 0, width/2, 0,
+                    0, f, height/2, 0,
+                    0, 0, 1, 0,
+                    0, 0, 0, 1;
     // clang-format on
 
     for (auto shader : shaders) {
