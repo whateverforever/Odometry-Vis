@@ -23,10 +23,10 @@ odometry::KeyFrame DataGenerator::getLatestKeyframe() {
   auto p_leftValue = std::make_shared<cv::Mat>(m_image_2);
 
   // clang-format off
-  odometry::Affine4f origin;
-  origin << 1, 0, 0, RandomFloat(-2,4),
-            0, 1, 0, RandomFloat(-2,4),
-            0, 0, 1, RandomFloat(-2,4),
+  odometry::Affine4f pose;
+  pose <<   1, 0, 0, RandomFloat(-4,4),
+            0, 1, 0, RandomFloat(-4,4),
+            0, 0, 1, RandomFloat(-4,4),
             0, 0, 0, 1;
   // clang-format on
 
@@ -35,9 +35,9 @@ odometry::KeyFrame DataGenerator::getLatestKeyframe() {
       Eigen::AngleAxisf(RandomFloat(0, 1) * M_PI, nanogui::Vector3f::UnitY()) *
       Eigen::AngleAxisf(RandomFloat(0, 1) * M_PI, nanogui::Vector3f::UnitZ());
 
-  origin.block<3, 3>(0, 0) = m;
+  pose.block<3, 3>(0, 0) = m;
 
   auto kframe = odometry::KeyFrame(p_leftRGB, p_rightRGB, p_leftDepth,
-                                   p_leftValue, origin);
+                                   p_leftValue, pose);
   return kframe;
 }
