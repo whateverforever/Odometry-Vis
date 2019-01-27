@@ -33,7 +33,8 @@ public:
         "out vec4 frag_color;\n"
         "void main() {\n"
         "    frag_color = vec4(0.7, 0.7, 0.7, 1.0);\n"
-        "    gl_Position = projMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);\n"
+        "    gl_Position = projMatrix * viewMatrix * modelMatrix * "
+        "vec4(position, 1.0);\n"
         "}",
 
         /* Fragment shader */
@@ -66,10 +67,33 @@ public:
         "    color = frag_color;\n"
         "}");
 
-        Matrix4f projMatrix = Matrix4f::Identity();
+    auto shaders = std::vector<nanogui::GLShader>{m_trajShader, m_camSymShader};
 
-        m_trajShader.bind();
-        m_trajShader.setUniform("projMatrix", projMatrix);
+    // focal length
+    float f = 1.0;
+    int width, height;
+
+    width = this->width();
+    height = this->height();
+
+    if (width == 0 || height == 0) {
+      width = this->fixedWidth();
+      height = this->fixedHeight();
+    }
+
+    std::cout << "GL Context is " << width << "x" << height << std::endl;
+
+    // clang-format off
+        Matrix4f projMatrix;
+        projMatrix <<   f, 0, width/2,
+                        0, f, height/2,
+                        0, 0, 1;
+    // clang-format on
+
+    for (auto shader : shaders) {
+      shader.bind();
+      shader.setUniform("projMatrix", projMatrix);
+    }
   }
 
   ~TrajectoryView() {
@@ -130,7 +154,7 @@ public:
         0.25f;
 
     Matrix4f viewMatrix = Matrix4f::Identity();
-    viewMatrix.block<3,1>(0,3) = Eigen::Vector3f(0,0,-0.5);
+    // viewMatrix.block<3, 1>(0, 3) = Eigen::Vector3f(0, 0, -0.5);
 
     m_trajShader.bind();
     m_trajShader.setUniform("modelMatrix", mvp);
