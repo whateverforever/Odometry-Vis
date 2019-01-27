@@ -71,6 +71,13 @@ void Vis::start() {
                                                   (rand() % 100) / 100.0f));
   });
 
+  Button *b_zoom = new Button(imageWindow2, "Increase Zoom");
+  b_zoom->setCallback([trajectoryView](){
+      auto zoom = trajectoryView->getZoom();
+
+      trajectoryView->setZoom(zoom + 1);
+  });
+
   // Button *b2 = new Button(imageWindow2, "Add new point");
   // b2->setCallback([trajectoryView]() {
 
