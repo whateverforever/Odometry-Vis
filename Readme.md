@@ -2,7 +2,14 @@
 
 > Visualization part for the [Direct Stereo Semi-dense Visual Odometry and 3D Reconstruction Project](https://github.com/WangYuTum/odometry)
 
-## Install
+## Install as Library
+
+To use this as a library in another CMake project, do the following
+
+    git submodule add https://github.com/whateverforever/Odometry-Vis.git
+    git submodule update --init --recursive
+
+## Install Standalone
 
 To get to run the example (main.cpp), clone this repository with its submodules:
 
