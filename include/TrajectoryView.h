@@ -81,7 +81,7 @@ public:
                       "in vec3 position;\n"
                       "out vec4 frag_color;\n"
                       "void main() {\n"
-                      "    frag_color = vec4(1.0, 0.5, 0.5, 1.0);\n"
+                      "    frag_color = vec4(position.x, 0, position.z, 1.0);\n"
                       "    gl_Position = projMatrix * viewMatrix * "
                       "vec4(position, 1.0);\n"
                       "}",
@@ -98,13 +98,17 @@ public:
     float gridSize = 2;
     float offset = gridSize / (float)(nLines-1);
 
-    m_gridLines = MatrixXf::Zero(3, 2 * nLines);
+    m_gridLines = MatrixXf::Zero(3, 2 * 2 * nLines);
 
     for (int i = 0; i < nLines; i ++) {
         float x = i*offset -gridSize/2;
+        float z = i*offset -gridSize/2;
 
-        m_gridLines.col(2*i) = Vector3f(x, 0, -gridSize/2);
-        m_gridLines.col(2*i + 1) = Vector3f(x, 0, gridSize/2);
+        m_gridLines.col(4*i + 0) = Vector3f(x, 0, -gridSize/2);
+        m_gridLines.col(4*i + 1) = Vector3f(x, 0, gridSize/2);
+
+        m_gridLines.col(4*i + 2) = Vector3f(-gridSize/2, 0, z);
+        m_gridLines.col(4*i + 3) = Vector3f( gridSize/2, 0, z);
     }
 
     m_gridShader.bind();
