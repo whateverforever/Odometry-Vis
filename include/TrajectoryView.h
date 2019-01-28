@@ -20,7 +20,7 @@ public:
     m_positions = MatrixXf::Zero(3, 1);
     m_cameraLines = MatrixXf::Zero(3, 16);
 
-    m_orthoZoom = 1;
+    m_orthoZoom = 4;
 
     m_trajShader.init(
         /* An identifying name */
@@ -182,48 +182,40 @@ public:
     modelMatrix.setIdentity();
     modelMatrix.topLeftCorner<3, 3>() =
         Eigen::Matrix3f(
-            Eigen::AngleAxisf(m_Rotation[0] * 0.5 * fTime, Vector3f::UnitX()) *
+            Eigen::AngleAxisf(0, Vector3f::UnitX()) *
             Eigen::AngleAxisf(m_Rotation[1] * 0.5 * fTime, Vector3f::UnitY()) *
-            Eigen::AngleAxisf(m_Rotation[2] * 0.5 * fTime, Vector3f::UnitZ())) *
+            Eigen::AngleAxisf(0, Vector3f::UnitZ())) *
         0.25f;
 
     Vector3f sceneMaxima = m_positions.rowwise().maxCoeff();
     Vector3f sceneMinima = m_positions.rowwise().minCoeff();
-    Vector3f sceneCenter = m_positions.rowwise().mean();
+    Vector3f sceneCenter = (sceneMaxima + sceneMinima) / 2;
+
+    std::cout << "Scene Center:\n" << sceneCenter << std::endl;
 
     Vector3f sceneBB = (sceneMaxima - sceneMinima).cwiseAbs();
+    float bSphereRadius = sceneBB.norm() / 2;
 
     float aspectRatio_screen = (float)this->width() / (float)this->height();
 
-    if (sceneBB.x() > sceneBB.y()) {
-      auto newDims = sceneBB.x() / aspectRatio_screen;
-
-      sceneBB.y() = newDims;
-      sceneBB.z() = newDims;
-    } else {
-      auto newDims = sceneBB.y() * aspectRatio_screen;
-
-      sceneBB.x() = newDims;
-      sceneBB.z() = newDims;
-    }
 
     float l, r, t, b, f, n;
 
-    l = (-sceneBB.x() / 2) / m_orthoZoom;
-    r = (sceneBB.x() / 2) / m_orthoZoom;
+    l = -bSphereRadius * aspectRatio_screen / m_orthoZoom;
+    r =  bSphereRadius * aspectRatio_screen / m_orthoZoom;
 
-    b = (-sceneBB.y() / 2) / m_orthoZoom;
-    t = (sceneBB.y() / 2) / m_orthoZoom;
+    b = -bSphereRadius / m_orthoZoom;
+    t =  bSphereRadius / m_orthoZoom;
 
     n = 0;
-    f = sceneBB.z();
+    f = 2 * bSphereRadius;
 
     Matrix4f projMatrix;
     projMatrix = nanogui::ortho(l, r, b, t, n, f);
     // projMatrix.transposeInPlace();
 
     Matrix4f viewMatrix =
-        nanogui::lookAt(Vector3f(2, 2, 2), Vector3f(0,0,0), Vector3f(0, 1, 0));
+        nanogui::lookAt(Vector3f(1, 1, 1), sceneCenter, Vector3f(0, 1, 0));
 
     for(auto shader : m_shaders) {
         shader.bind();
