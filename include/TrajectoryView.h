@@ -20,7 +20,9 @@ public:
     m_positions = MatrixXf::Zero(3, 1);
     m_cameraLines = MatrixXf::Zero(3, 16);
 
-    m_orthoZoom = 4;
+    m_orthoZoom = 1;
+
+    m_mousePrevious = {-1,-1};
 
     m_trajShader.init(
         /* An identifying name */
@@ -75,14 +77,13 @@ public:
     m_gridShader.init("coordinate_grid_shader",
                       /* Vertex shader */
                       "#version 330\n"
-                      "uniform mat4 modelMatrix;\n"
                       "uniform mat4 viewMatrix;\n"
                       "uniform mat4 projMatrix;\n"
                       "in vec3 position;\n"
                       "out vec4 frag_color;\n"
                       "void main() {\n"
                       "    frag_color = vec4(position.x, 0, position.z, 1.0);\n"
-                      "    gl_Position = projMatrix * viewMatrix * "
+                      "    gl_Position = projMatrix * viewMatrix *"
                       "vec4(position, 1.0);\n"
                       "}",
 
@@ -94,8 +95,8 @@ public:
                       "    color = frag_color;\n"
                       "}");
 
-    int nLines = 11;
-    float gridSize = 1;
+    int nLines = 21;
+    float gridSize = 20;
     float offset = gridSize / (float)(nLines-1);
 
     m_gridLines = MatrixXf::Zero(3, 2 * 2 * nLines);
@@ -121,6 +122,27 @@ public:
     };
 
     std::cout << "Grid lines:\n" << m_gridLines << std::endl;
+  }
+
+  bool mouseDragEvent(const nanogui::Vector2i &p, const nanogui::Vector2i &rel,
+                      int button, int modifiers) override {
+    std::cout << "Dragging:" << p << ", rel: " << rel << ", button:" << button
+              << ", modifiers:" << modifiers << std::endl;
+
+    float factX = 0.1;
+    float factY = 0.1;
+
+    if(m_mousePrevious.x() == -1 && m_mousePrevious.y() == -1) {
+        m_mousePrevious = p;
+        return false;
+    }
+
+    m_angleX += (p.x() - m_mousePrevious.x()) * factX;
+    m_angleY += (p.y() - m_mousePrevious.y()) * factY;
+
+    m_mousePrevious = p;
+
+    return true;
   }
 
   ~TrajectoryView() {
@@ -196,10 +218,13 @@ public:
     Vector3f sceneMinima = m_positions.rowwise().minCoeff();
     Vector3f sceneCenter = (sceneMaxima + sceneMinima) / 2;
 
-    std::cout << "Scene Center:\n" << sceneCenter << std::endl;
+    // addPoint(sceneCenter);
 
     Vector3f sceneBB = (sceneMaxima - sceneMinima).cwiseAbs();
+
     float bSphereRadius = sceneBB.norm() / 2;
+    float padding = 1.05; // add %5 padding around the scene
+    bSphereRadius *= padding;
 
     float aspectRatio_screen = (float)this->width() / (float)this->height();
 
@@ -212,19 +237,41 @@ public:
     b = -bSphereRadius / m_orthoZoom;
     t =  bSphereRadius / m_orthoZoom;
 
-    n = 0;
-    f = 2 * bSphereRadius;
+    // Vector3f cameraPos = sceneCenter;
+    // cameraPos.x() += bSphereRadius;
+    // cameraPos.y() += bSphereRadius;
+    // cameraPos.z() += bSphereRadius;
+
+    Vector3f cameraPos = {3,3,3};
+
+    n = (cameraPos - sceneCenter).norm() - bSphereRadius;
+    f = (cameraPos - sceneCenter).norm() + bSphereRadius;
 
     Matrix4f projMatrix;
     projMatrix = nanogui::ortho(l, r, b, t, n, f);
-    // projMatrix.transposeInPlace();
+    //projMatrix.transposeInPlace();
 
-    Matrix4f viewMatrix =
-        nanogui::lookAt(Vector3f(1, 1, 1), sceneCenter, Vector3f(0, 1, 0));
+    Matrix4f viewMatrix;
+    viewMatrix = Matrix4f::Identity();
+    //viewMatrix *= nanogui::translate(cameraPos);
+    viewMatrix *= nanogui::lookAt(cameraPos, sceneCenter, Vector3f(0, 1, 0));
+    //viewMatrix.transposeInPlace();
+
+    Matrix3f m = Eigen::Matrix3f(Eigen::AngleAxisf(0, Vector3f::UnitX()) *
+                    Eigen::AngleAxisf(m_angleX, Vector3f::UnitY()) *
+                    Eigen::AngleAxisf(0, Vector3f::UnitZ()));
+
+    Matrix4f m2 = Matrix4f::Identity();
+    m2.block<3,3>(0,0) = m;
+
+    viewMatrix *= m2;
+
 
     for(auto shader : m_shaders) {
         shader.bind();
-        shader.setUniform("modelMatrix", modelMatrix);
+        if(shader.uniform("modelMatrix") > -1) {
+            shader.setUniform("modelMatrix", modelMatrix);
+        }
         shader.setUniform("viewMatrix", viewMatrix);
         shader.setUniform("projMatrix", projMatrix);
     }
@@ -253,6 +300,10 @@ private:
   std::vector<nanogui::GLShader> m_shaders;
 
   Eigen::Vector3f m_Rotation;
+
+  nanogui::Vector2i m_mousePrevious;
+  float m_angleX;
+  float m_angleY;
 
   float m_orthoZoom;
 };
