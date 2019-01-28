@@ -60,7 +60,8 @@ public:
         "out vec4 frag_color;\n"
         "void main() {\n"
         "    frag_color = vec4(1.0, 1.0, 1.0, 1.0);\n"
-        "    gl_Position = projMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);\n"
+        "    gl_Position = projMatrix * viewMatrix * modelMatrix * "
+        "vec4(position, 1.0);\n"
         "}",
 
         /* Fragment shader */
@@ -80,13 +81,11 @@ public:
   void setRotation(nanogui::Vector3f vRotation) { m_Rotation = vRotation; }
 
   void setZoom(float zoom) {
-      std::cout << "Increased zoom:" << zoom << std::endl;
-      m_orthoZoom = zoom;
+    std::cout << "Increased zoom:" << zoom << std::endl;
+    m_orthoZoom = zoom;
   }
 
-  float getZoom() {
-      return m_orthoZoom;
-  }
+  float getZoom() { return m_orthoZoom; }
 
   std::unique_ptr<nanogui::Vector3f> getLastPoint() {
     return std::make_unique<nanogui::Vector3f>(
@@ -129,62 +128,30 @@ public:
 
     float fTime = (float)glfwGetTime();
 
-    Matrix4f mvp;
-    mvp.setIdentity();
-    mvp.topLeftCorner<3, 3>() =
+    Matrix4f modelMatrix;
+    modelMatrix.setIdentity();
+    modelMatrix.topLeftCorner<3, 3>() =
         Eigen::Matrix3f(
             Eigen::AngleAxisf(m_Rotation[0] * 0.5 * fTime, Vector3f::UnitX()) *
             Eigen::AngleAxisf(m_Rotation[1] * 0.5 * fTime, Vector3f::UnitY()) *
             Eigen::AngleAxisf(m_Rotation[2] * 0.5 * fTime, Vector3f::UnitZ())) *
         0.25f;
 
-    Matrix4f viewMatrix = Matrix4f::Identity();
-    // viewMatrix.block<3, 1>(0, 3) = Eigen::Vector3f(0, 0, 0);
-
-    // clang-format off
-    float l, r, t, b, f, n;
-    l = -m_orthoZoom;
-    b = -m_orthoZoom;
-
-    r = m_orthoZoom;
-    t = m_orthoZoom;
-
-    n = 0.01;
-    f = 2*m_orthoZoom-n;
-
     Matrix4f projMatrix;
-    // projMatrix <<   2/(r-l),    0,          0,          -(r+l)/(r-l),
-    //                 0,          2/(t-b),    0,          -(t+b)/(t-b),
-    //                 0,          0,          -2/(f-n),   -(f+n)/(f-n),
-    //                 0,          0,          0,          1;
-    // projMatrix.transposeInPlace();
-
-    projMatrix = nanogui::ortho(l,r,b,t,n,f);
+    projMatrix = nanogui::ortho(l, r, b, t, n, f);
     projMatrix.transposeInPlace();
 
-    viewMatrix = nanogui::lookAt(Vector3f(2,2,2), Vector3f(0,0,0), Vector3f(0,1,0));
-
-
-    // projMatrix <<   2/(r-l),        0,              0,              0,
-    //                 0,              2/(t-b),        0,              0,
-    //                 0,              0,              -2/(f-n),       0,
-    //                 -(r+l)/(r-l),   -(t+b)/(t-b),   -(f+n)/(f-n),   1;
-    /*
-    projMatrix <<   2/(r-l),        0,              0,              0,
-                    0,              2/(t-b),        0,              0,
-                    0,              0,              -2/(f-n),       0,
-                    0,              0,              0,              1;
-    */
-    // clang-format on
+    Matrix4f viewMatrix = nanogui::lookAt(Vector3f(2, 2, 2), Vector3f(0, 0, 0),
+                                          Vector3f(0, 1, 0));
 
     m_trajShader.bind();
-    m_trajShader.setUniform("modelMatrix", mvp);
+    m_trajShader.setUniform("modelMatrix", modelMatrix);
     m_trajShader.setUniform("viewMatrix", viewMatrix);
     m_trajShader.setUniform("projMatrix", projMatrix);
     m_trajShader.drawArray(GL_LINE_STRIP, 0, m_positions.cols());
 
     m_camSymShader.bind();
-    m_camSymShader.setUniform("modelMatrix", mvp);
+    m_camSymShader.setUniform("modelMatrix", modelMatrix);
     m_camSymShader.setUniform("viewMatrix", viewMatrix);
     m_camSymShader.setUniform("projMatrix", projMatrix);
     m_camSymShader.drawArray(GL_LINES, 0, m_cameraLines.cols());
