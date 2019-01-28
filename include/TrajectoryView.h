@@ -71,6 +71,50 @@ public:
         "void main() {\n"
         "    color = frag_color;\n"
         "}");
+
+    m_gridShader.init("coordinate_grid_shader",
+                      /* Vertex shader */
+                      "#version 330\n"
+                      "uniform mat4 modelMatrix;\n"
+                      "uniform mat4 viewMatrix;\n"
+                      "uniform mat4 projMatrix;\n"
+                      "in vec3 position;\n"
+                      "out vec4 frag_color;\n"
+                      "void main() {\n"
+                      "    frag_color = vec4(1.0, 0.5, 0.5, 1.0);\n"
+                      "    gl_Position = projMatrix * viewMatrix * "
+                      "vec4(position, 1.0);\n"
+                      "}",
+
+                      /* Fragment shader */
+                      "#version 330\n"
+                      "out vec4 color;\n"
+                      "in vec4 frag_color;\n"
+                      "void main() {\n"
+                      "    color = frag_color;\n"
+                      "}");
+
+    int nLines = 10;
+    float gridSize = 2;
+    float offset = gridSize / (float)nLines;
+
+    m_gridLines = MatrixXf::Zero(3, 2 * nLines);
+
+    for (int i = 0; i < 2 * nLines; i += 2) {
+        m_gridLines.col(i) = Vector3f(i*offset, 0, -gridSize/2);
+        m_gridLines.col(i+1) = Vector3f(i*offset, 0, gridSize/2);
+    }
+
+    m_gridShader.bind();
+    m_gridShader.uploadAttrib("position", m_gridLines);
+
+    m_shaders = {
+        m_trajShader,
+        m_camSymShader,
+        m_gridShader
+    };
+
+    std::cout << "Grid lines:\n" << m_gridLines << std::endl;
   }
 
   ~TrajectoryView() {
@@ -137,24 +181,59 @@ public:
             Eigen::AngleAxisf(m_Rotation[2] * 0.5 * fTime, Vector3f::UnitZ())) *
         0.25f;
 
+    Vector3f sceneMaxima = m_positions.rowwise().maxCoeff();
+    Vector3f sceneMinima = m_positions.rowwise().minCoeff();
+    Vector3f sceneCenter = m_positions.rowwise().mean();
+
+    Vector3f sceneBB = (sceneMaxima - sceneMinima).cwiseAbs();
+
+    float aspectRatio_screen = (float)this->width() / (float)this->height();
+
+    if (sceneBB.x() > sceneBB.y()) {
+      auto newDims = sceneBB.x() / aspectRatio_screen;
+
+      sceneBB.y() = newDims;
+      sceneBB.z() = newDims;
+    } else {
+      auto newDims = sceneBB.y() * aspectRatio_screen;
+
+      sceneBB.x() = newDims;
+      sceneBB.z() = newDims;
+    }
+
+    float l, r, t, b, f, n;
+
+    l = (sceneCenter(0) - sceneBB.x() / 2) / m_orthoZoom;
+    r = (sceneCenter(0) + sceneBB.x() / 2) / m_orthoZoom;
+
+    b = (sceneCenter(1) - sceneBB.y() / 2) / m_orthoZoom;
+    t = (sceneCenter(1) + sceneBB.y() / 2) / m_orthoZoom;
+
+    n = 0;
+    f = sceneBB.z();
+
     Matrix4f projMatrix;
     projMatrix = nanogui::ortho(l, r, b, t, n, f);
-    projMatrix.transposeInPlace();
+    // projMatrix.transposeInPlace();
 
-    Matrix4f viewMatrix = nanogui::lookAt(Vector3f(2, 2, 2), Vector3f(0, 0, 0),
-                                          Vector3f(0, 1, 0));
+    Matrix4f viewMatrix =
+        nanogui::lookAt(Vector3f(0, 2, 0), sceneCenter, Vector3f(0, 1, 0));
+
+    for(auto shader : m_shaders) {
+        shader.bind();
+        shader.setUniform("modelMatrix", modelMatrix);
+        shader.setUniform("viewMatrix", viewMatrix);
+        shader.setUniform("projMatrix", projMatrix);
+    }
 
     m_trajShader.bind();
-    m_trajShader.setUniform("modelMatrix", modelMatrix);
-    m_trajShader.setUniform("viewMatrix", viewMatrix);
-    m_trajShader.setUniform("projMatrix", projMatrix);
     m_trajShader.drawArray(GL_LINE_STRIP, 0, m_positions.cols());
 
     m_camSymShader.bind();
-    m_camSymShader.setUniform("modelMatrix", modelMatrix);
-    m_camSymShader.setUniform("viewMatrix", viewMatrix);
-    m_camSymShader.setUniform("projMatrix", projMatrix);
     m_camSymShader.drawArray(GL_LINES, 0, m_cameraLines.cols());
+
+    m_gridShader.bind();
+    m_gridShader.drawArray(GL_LINES, 0, m_gridLines.cols());
 
     glDisable(GL_DEPTH_TEST);
   }
@@ -162,9 +241,13 @@ public:
 private:
   nanogui::MatrixXf m_positions;
   nanogui::MatrixXf m_cameraLines;
+  nanogui::MatrixXf m_gridLines;
 
   nanogui::GLShader m_trajShader;
   nanogui::GLShader m_camSymShader;
+  nanogui::GLShader m_gridShader;
+
+  std::vector<nanogui::GLShader> m_shaders;
 
   Eigen::Vector3f m_Rotation;
 
