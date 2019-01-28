@@ -281,8 +281,8 @@ public:
     float panFactor = 2;
     Vector3f panMatrix = nanogui::unproject(
         {
-             (float)m_pan.x() * panFactor,
-            -(float)m_pan.y() * panFactor,
+             (float)m_pan.x() * panFactor / m_orthoZoom,
+            -(float)m_pan.y() * panFactor / m_orthoZoom,
             0
         },
         Matrix4f::Identity(),
