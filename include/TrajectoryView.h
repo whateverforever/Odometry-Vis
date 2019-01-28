@@ -129,12 +129,12 @@ public:
     std::cout << "Dragging:" << p << ", rel: " << rel << ", button:" << button
               << ", modifiers:" << modifiers << std::endl;
 
-    float factX = 0.1;
-    float factY = 0.1;
+    float factX = 0.01;
+    float factY = 0.01;
 
-    if(m_mousePrevious.x() == -1 && m_mousePrevious.y() == -1) {
-        m_mousePrevious = p;
-        return false;
+    if (m_mousePrevious.x() == -1 && m_mousePrevious.y() == -1) {
+      m_mousePrevious = p;
+      return false;
     }
 
     m_angleX += (p.x() - m_mousePrevious.x()) * factX;
@@ -143,6 +143,16 @@ public:
     m_mousePrevious = p;
 
     return true;
+  }
+
+  bool scrollEvent(const nanogui::Vector2i &p, const nanogui::Vector2f &rel) override {
+      float scrollFactor = 0.1;
+
+      m_orthoZoom += scrollFactor * rel.y();
+
+      std::cout << "Zoom: " << m_orthoZoom << std::endl;
+
+      return true;
   }
 
   ~TrajectoryView() {
