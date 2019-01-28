@@ -22,7 +22,8 @@ public:
 
     m_orthoZoom = 1;
 
-    m_mousePrevious = {-1,-1};
+    m_pan = {0,0};
+    m_rotate = {0,0};
 
     m_trajShader.init(
         /* An identifying name */
@@ -129,19 +130,12 @@ public:
     std::cout << "Dragging:" << p << ", rel: " << rel << ", button:" << button
               << ", modifiers:" << modifiers << std::endl;
 
-    float factX = 0.01;
-    float factY = 0.01;
-
-    if (m_mousePrevious.x() == -1 && m_mousePrevious.y() == -1) {
-      m_mousePrevious = p;
-      return false;
+    if(modifiers == 2) {
+        m_pan += rel;
+        return true;
     }
 
-    m_angleX += (p.x() - m_mousePrevious.x()) * factX;
-    m_angleY += (p.y() - m_mousePrevious.y()) * factY;
-
-    m_mousePrevious = p;
-
+    m_rotate.x() += rel.x();
     return true;
   }
 
@@ -259,17 +253,24 @@ public:
 
     Matrix4f projMatrix;
     projMatrix = nanogui::ortho(l, r, b, t, n, f);
-    //projMatrix.transposeInPlace();
 
     Matrix4f viewMatrix;
     viewMatrix = Matrix4f::Identity();
-    //viewMatrix *= nanogui::translate(cameraPos);
     viewMatrix *= nanogui::lookAt(cameraPos, sceneCenter, Vector3f(0, 1, 0));
-    //viewMatrix.transposeInPlace();
 
-    Matrix3f m = Eigen::Matrix3f(Eigen::AngleAxisf(0, Vector3f::UnitX()) *
-                    Eigen::AngleAxisf(m_angleX, Vector3f::UnitY()) *
-                    Eigen::AngleAxisf(0, Vector3f::UnitZ()));
+    float panFactor = 0.1;
+    Vector3f tmp(0,0,0);
+    tmp.x() =  panFactor * (float)m_pan.y();
+    tmp.z() = -panFactor * (float)m_pan.x();
+
+    viewMatrix *= nanogui::translate(tmp);
+
+    float rotateFactor = 0.01;
+    Matrix3f m = Eigen::Matrix3f(
+                    Eigen::AngleAxisf(0, Vector3f::UnitX()) *
+                    Eigen::AngleAxisf(m_rotate.x() * rotateFactor, Vector3f::UnitY()) *
+                    Eigen::AngleAxisf(0, Vector3f::UnitZ())
+    );
 
     Matrix4f m2 = Matrix4f::Identity();
     m2.block<3,3>(0,0) = m;
@@ -312,8 +313,8 @@ private:
   Eigen::Vector3f m_Rotation;
 
   nanogui::Vector2i m_mousePrevious;
-  float m_angleX;
-  float m_angleY;
+  nanogui::Vector2i m_pan;
+  nanogui::Vector2i m_rotate;
 
   float m_orthoZoom;
 };
