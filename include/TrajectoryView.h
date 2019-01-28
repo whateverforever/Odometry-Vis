@@ -130,7 +130,7 @@ public:
     std::cout << "Dragging:" << p << ", rel: " << rel << ", button:" << button
               << ", modifiers:" << modifiers << std::endl;
 
-    if(modifiers == 2) {
+    if(modifiers ==  2) {
         m_pan += rel;
         return true;
     }
@@ -144,7 +144,9 @@ public:
 
       m_orthoZoom += scrollFactor * rel.y();
 
-      std::cout << "Zoom: " << m_orthoZoom << std::endl;
+      if(m_orthoZoom < 0) {
+          m_orthoZoom = 0;
+      }
 
       return true;
   }
@@ -220,6 +222,7 @@ public:
 
     Vector3f sceneMaxima = m_positions.rowwise().maxCoeff();
     Vector3f sceneMinima = m_positions.rowwise().minCoeff();
+    Vector3f sceneMean = m_positions.rowwise().mean();
     Vector3f sceneCenter = (sceneMaxima + sceneMinima) / 2;
 
     // addPoint(sceneCenter);
@@ -231,8 +234,6 @@ public:
     bSphereRadius *= padding;
 
     float aspectRatio_screen = (float)this->width() / (float)this->height();
-
-
     float l, r, t, b, f, n;
 
     l = -bSphereRadius * aspectRatio_screen / m_orthoZoom;
@@ -241,15 +242,34 @@ public:
     b = -bSphereRadius / m_orthoZoom;
     t =  bSphereRadius / m_orthoZoom;
 
-    // Vector3f cameraPos = sceneCenter;
-    // cameraPos.x() += bSphereRadius;
-    // cameraPos.y() += bSphereRadius;
-    // cameraPos.z() += bSphereRadius;
+    Vector3f cameraPos = {20,20,20};//sceneMaxima;
 
-    Vector3f cameraPos = {3,3,3};
+    n = -10;
+    f = 100;
 
-    n = (cameraPos - sceneCenter).norm() - bSphereRadius;
-    f = (cameraPos - sceneCenter).norm() + bSphereRadius;
+    std::cout << "Close plane: " << n << std::endl;
+    std::cout << "Far plane: " << f << std::endl;
+    std::cout << "Distance from cam to scene:" << (cameraPos - sceneCenter).norm() << std::endl;
+    std::cout << "l/r:" << l << "/" << r << std::endl;
+    std::cout << "b/t:" << b << "/" << t << std::endl;
+    std::cout << "Center of Scene: " << sceneCenter << std::endl;
+    std::cout << "Mean of scene: " << sceneMean << std::endl;
+
+    /*
+    Close plane: 21.4174
+    Far plane: 40.059
+    Distance from cam to scene:30.7382
+    l/r:-9.32079/9.32079
+    b/t:-9.32079/9.32079
+    Center of Scene:
+    3.00003
+    -0.756663
+    5
+    Mean of scene:
+    1.85775
+    -0.378332
+    3.8806
+    */
 
     Matrix4f projMatrix;
     projMatrix = nanogui::ortho(l, r, b, t, n, f);
@@ -258,12 +278,22 @@ public:
     viewMatrix = Matrix4f::Identity();
     viewMatrix *= nanogui::lookAt(cameraPos, sceneCenter, Vector3f(0, 1, 0));
 
-    float panFactor = 0.1;
-    Vector3f tmp(0,0,0);
-    tmp.x() =  panFactor * (float)m_pan.y();
-    tmp.z() = -panFactor * (float)m_pan.x();
+    float panFactor = 2;
+    Vector3f panMatrix = nanogui::unproject(
+        {
+             (float)m_pan.x() * panFactor,
+            -(float)m_pan.y() * panFactor,
+            0
+        },
+        Matrix4f::Identity(),
+        viewMatrix,
+        {
+            this->width(),
+            this->height()
+        }
+    );
 
-    viewMatrix *= nanogui::translate(tmp);
+    viewMatrix *= nanogui::translate(panMatrix);
 
     float rotateFactor = 0.01;
     Matrix3f m = Eigen::Matrix3f(
