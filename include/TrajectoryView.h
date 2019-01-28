@@ -95,7 +95,7 @@ public:
                       "}");
 
     int nLines = 11;
-    float gridSize = 2;
+    float gridSize = 1;
     float offset = gridSize / (float)(nLines-1);
 
     m_gridLines = MatrixXf::Zero(3, 2 * 2 * nLines);
@@ -209,11 +209,11 @@ public:
 
     float l, r, t, b, f, n;
 
-    l = (sceneCenter(0) - sceneBB.x() / 2) / m_orthoZoom;
-    r = (sceneCenter(0) + sceneBB.x() / 2) / m_orthoZoom;
+    l = (-sceneBB.x() / 2) / m_orthoZoom;
+    r = (sceneBB.x() / 2) / m_orthoZoom;
 
-    b = (sceneCenter(1) - sceneBB.y() / 2) / m_orthoZoom;
-    t = (sceneCenter(1) + sceneBB.y() / 2) / m_orthoZoom;
+    b = (-sceneBB.y() / 2) / m_orthoZoom;
+    t = (sceneBB.y() / 2) / m_orthoZoom;
 
     n = 0;
     f = sceneBB.z();
@@ -223,7 +223,7 @@ public:
     // projMatrix.transposeInPlace();
 
     Matrix4f viewMatrix =
-        nanogui::lookAt(Vector3f(0, 2, 0), sceneCenter, Vector3f(0, 1, 0));
+        nanogui::lookAt(Vector3f(2, 2, 2), Vector3f(0,0,0), Vector3f(0, 1, 0));
 
     for(auto shader : m_shaders) {
         shader.bind();
