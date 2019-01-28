@@ -142,6 +142,11 @@ public:
         m_positions.col(m_positions.cols() - 1));
   }
 
+  void addPoint(const nanogui::Vector3f &point) {
+    m_positions.conservativeResize(Eigen::NoChange, m_positions.cols() + 1);
+    m_positions.col(m_positions.cols() - 1) = point;
+  }
+
   void addPose(odometry::Affine4f pose) {
     nanogui::Matrix3f newRotation = pose.block<3, 3>(0, 0);
     nanogui::Vector3f newPoint = pose.block<3, 1>(0, 3);

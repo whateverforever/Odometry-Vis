@@ -78,6 +78,12 @@ void Vis::start() {
       trajectoryView->setZoom(zoom + 1);
   });
 
+  Button *b_addPoint = new Button(imageWindow2, "Add outlier point");
+  b_addPoint->setCallback([trajectoryView](){
+      auto newPoint = Vector3f(10,0,0);
+      trajectoryView->addPoint(newPoint);
+  });
+
   // Button *b2 = new Button(imageWindow2, "Add new point");
   // b2->setCallback([trajectoryView]() {
 
