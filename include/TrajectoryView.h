@@ -94,15 +94,17 @@ public:
                       "    color = frag_color;\n"
                       "}");
 
-    int nLines = 10;
+    int nLines = 11;
     float gridSize = 2;
-    float offset = gridSize / (float)nLines;
+    float offset = gridSize / (float)(nLines-1);
 
     m_gridLines = MatrixXf::Zero(3, 2 * nLines);
 
-    for (int i = 0; i < 2 * nLines; i += 2) {
-        m_gridLines.col(i) = Vector3f(i*offset, 0, -gridSize/2);
-        m_gridLines.col(i+1) = Vector3f(i*offset, 0, gridSize/2);
+    for (int i = 0; i < nLines; i ++) {
+        float x = i*offset -gridSize/2;
+
+        m_gridLines.col(2*i) = Vector3f(x, 0, -gridSize/2);
+        m_gridLines.col(2*i + 1) = Vector3f(x, 0, gridSize/2);
     }
 
     m_gridShader.bind();
