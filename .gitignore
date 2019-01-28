@@ -3,3 +3,4 @@ cmake-build-debug
 data/*
 sample_*.h
 build
+*.ipynb
