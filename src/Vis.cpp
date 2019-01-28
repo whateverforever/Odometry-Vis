@@ -71,15 +71,25 @@ void Vis::start() {
                                                   (rand() % 100) / 100.0f));
   });
 
-  // Button *b2 = new Button(imageWindow2, "Add new point");
-  // b2->setCallback([trajectoryView]() {
+  Button *b_zoom = new Button(imageWindow2, "Increase Zoom");
+  b_zoom->setCallback([trajectoryView](){
+      auto zoom = trajectoryView->getZoom();
 
-  //   auto newPoint = nanogui::Vector3f(
-  //       (rand() % 100) / 100.0f * 2 - 1, (rand() % 100) / 100.0f * 2 - 1,
-  //       (rand() % 100) / 100.0f * 2 - 1);
+      trajectoryView->setZoom(zoom * 1.1);
+  });
 
-  //   trajectoryView->addPoint(newPoint);
-  // });
+  Button *b_zoom2 = new Button(imageWindow2, "Decrease Zoom");
+  b_zoom2->setCallback([trajectoryView](){
+      auto zoom = trajectoryView->getZoom();
+
+      trajectoryView->setZoom(zoom * 0.9);
+  });
+
+  Button *b_addPoint = new Button(imageWindow2, "Add outlier point");
+  b_addPoint->setCallback([trajectoryView](){
+      auto newPoint = Vector3f(10, 0, 10);
+      trajectoryView->addPoint(newPoint);
+  });
 
   // Use redraw to reload images & points from data sources
   screen->onUpdate([this, trajectoryView]() {
