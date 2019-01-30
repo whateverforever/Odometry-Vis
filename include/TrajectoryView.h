@@ -18,6 +18,7 @@ public:
     using namespace nanogui;
 
     m_positions = MatrixXf::Zero(3, 1);
+    m_points = MatrixXf::Zero(3, 0);
     m_cameraLines = MatrixXf::Zero(3, 16);
 
     m_orthoZoom = 1;
@@ -170,9 +171,23 @@ public:
         m_positions.col(m_positions.cols() - 1));
   }
 
+  // TODO: rename or sth to make clear it's about trajectory points
   void addPoint(const nanogui::Vector3f &point) {
     m_positions.conservativeResize(Eigen::NoChange, m_positions.cols() + 1);
     m_positions.col(m_positions.cols() - 1) = point;
+  }
+
+  void addPoints(const std::vector<nanogui::Vector3f> &newPoints) {
+      int numExistingPoints = m_points.cols();
+      int numNewPoints = newPoints.size();
+
+      m_points.conservativeResize(Eigen::NoChange, numExistingPoints + numNewPoints);
+
+      for(int i = 0; i < numNewPoints; i++) {
+        m_points.col(numExistingPoints + i) = newPoints[i];
+      }
+
+      std::cout << "Added new bunch of points:\n" << m_points << std::endl;
   }
 
   void addPose(odometry::Affine4f pose) {
@@ -333,6 +348,7 @@ private:
   nanogui::MatrixXf m_positions;
   nanogui::MatrixXf m_cameraLines;
   nanogui::MatrixXf m_gridLines;
+  nanogui::MatrixXf m_points;
 
   nanogui::GLShader m_trajShader;
   nanogui::GLShader m_camSymShader;

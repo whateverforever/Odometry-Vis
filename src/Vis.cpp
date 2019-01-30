@@ -72,23 +72,23 @@ void Vis::start() {
   });
 
   Button *b_zoom = new Button(imageWindow2, "Increase Zoom");
-  b_zoom->setCallback([trajectoryView](){
-      auto zoom = trajectoryView->getZoom();
+  b_zoom->setCallback([trajectoryView]() {
+    auto zoom = trajectoryView->getZoom();
 
-      trajectoryView->setZoom(zoom * 1.1);
+    trajectoryView->setZoom(zoom * 1.1);
   });
 
   Button *b_zoom2 = new Button(imageWindow2, "Decrease Zoom");
-  b_zoom2->setCallback([trajectoryView](){
-      auto zoom = trajectoryView->getZoom();
+  b_zoom2->setCallback([trajectoryView]() {
+    auto zoom = trajectoryView->getZoom();
 
-      trajectoryView->setZoom(zoom * 0.9);
+    trajectoryView->setZoom(zoom * 0.9);
   });
 
   Button *b_addPoint = new Button(imageWindow2, "Add outlier point");
-  b_addPoint->setCallback([trajectoryView](){
-      auto newPoint = Vector3f(10, 0, 10);
-      trajectoryView->addPoint(newPoint);
+  b_addPoint->setCallback([trajectoryView]() {
+    auto newPoint = Vector3f(10, 0, 10);
+    trajectoryView->addPoint(newPoint);
   });
 
   // Use redraw to reload images & points from data sources
@@ -118,7 +118,11 @@ void Vis::start() {
 
       odometry::Affine4f absolutePose = keyframe.GetAbsoPose();
 
+      std::vector<nanogui::Vector3f> projectedPoints = {
+          {0, 0, 0}, {1, 1, 1}, {2, 2, 2}, {3, 3, 3}};
+
       m_view->addPose(absolutePose);
+      m_view->addPoints(projectedPoints);
     }
 
     m_keyframeBuffer.clear();
