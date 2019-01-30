@@ -34,6 +34,11 @@ Vis::Vis(float fx, float fy, float f_theta, float cx, float cy) {
                     0,       fy, cy, 0,
                     0,        0,  1, 0,
                     0,        0,  0, 1;
+
+  m_intrinsicsInv << 1/fx, -f_theta/(fx*fy), -(cx*fy -cy*f_theta)/(fx*fy), 0,
+                        0,             1/fy,                       -cy/fy, 0,
+                        0,                0,                            1, 0,
+                        0,                0,                            0, 1;
   // clang-format on
   std::cout << "Set intrinsics:\n" << m_intrinsics << std::endl;
 }
@@ -198,8 +203,7 @@ void Vis::start() {
           }
 
           Vector4f pointImage(xi, yi, zi, 1);
-          Vector4f pointCamera =
-              m_intrinsics.inverse() * pointImage; // TODO: Replace inverse()
+          Vector4f pointCamera = m_intrinsicsInv * pointImage;
           Vector4f pointWorld = absolutePose * pointCamera;
 
           projectedPoints.push_back(
