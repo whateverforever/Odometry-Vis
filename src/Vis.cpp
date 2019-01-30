@@ -24,7 +24,18 @@ void bindMatToTexture(const cv::Mat &image, GLuint textureId) {
                   GL_UNSIGNED_BYTE, image.ptr());
 }
 
-Vis::Vis() { m_lastFrameTime = glfwGetTime(); }
+Vis::Vis(float fx, float fy, float f_theta, float cx, float cy) {
+  m_lastFrameTime = glfwGetTime();
+
+  // clang-format off
+  m_intrinsics = nanogui::Matrix4f::Identity();
+  m_intrinsics <<   fx, f_theta, cx, 0,
+                    0,       fy, cy, 0,
+                    0,        0,  1, 0,
+                    0,        0,  0, 1;
+  // clang-format on
+  std::cout << "Set intrinsics:\n" << m_intrinsics << std::endl;
+}
 
 void Vis::loadNewestKeyframe(const odometry::KeyFrame &keyframe) {
   m_keyframeBuffer.push_back(keyframe);

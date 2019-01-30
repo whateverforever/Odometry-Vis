@@ -18,7 +18,7 @@
 
 class Vis {
 public:
-  Vis();
+  Vis(float, float, float, float, float);
   void start();
   void loadNewestKeyframe(const odometry::KeyFrame &);
 
@@ -26,9 +26,12 @@ private:
   double m_lastFrameTime;
   int m_numElapsedFrames;
   double m_fps;
+
   GLuint m_rgbLeftTexId;
   GLuint m_rgbRightTexId;
   GLuint m_depthLeftTexId;
+
+  nanogui::Matrix4f m_intrinsics;
 
   std::vector<odometry::KeyFrame> m_keyframeBuffer;
   TrajectoryView *m_view;

@@ -12,7 +12,10 @@
 #include <Vis.h>
 
 int main(int /* argc */, char ** /* argv */) {
-  auto myUI = new Vis();
+  // parameters of the freiburg camera
+  float fx = 535.4, fy = 539.2, f_theta = 0, cx = 320.1, cy = 247.6;
+
+  auto myUI = new Vis(fx, fy, f_theta, cx, cy);
   auto dataGenerator = new DataGenerator();
   auto mockCamera = new MockCameraInput();
 
