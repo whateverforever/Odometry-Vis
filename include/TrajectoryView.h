@@ -17,7 +17,7 @@ public:
   TrajectoryView(Widget *parent) : nanogui::GLCanvas(parent) {
     using namespace nanogui;
 
-    m_positions = MatrixXf::Zero(3, 1);
+    m_trajPositions = MatrixXf::Zero(3, 1);
     m_points = MatrixXf::Zero(3, 0);
     m_cameraLines = MatrixXf::Zero(3, 16);
 
@@ -84,7 +84,7 @@ public:
                         "in vec3 position;\n"
                         "out vec4 frag_color;\n"
                         "void main() {\n"
-                        "    gl_PointSize = 5.0;\n"
+                        "    gl_PointSize = 1.0;\n"
                         "    frag_color = vec4(1.0, 1.0, 1.0, 1.0);\n"
                         "    gl_Position = projMatrix * viewMatrix * "
                         "vec4(position, 1.0);\n"
@@ -188,13 +188,14 @@ public:
 
   std::unique_ptr<nanogui::Vector3f> getLastPoint() {
     return std::make_unique<nanogui::Vector3f>(
-        m_positions.col(m_positions.cols() - 1));
+        m_trajPositions.col(m_trajPositions.cols() - 1));
   }
 
   // TODO: rename or sth to make clear it's about trajectory points
   void addPoint(const nanogui::Vector3f &point) {
-    m_positions.conservativeResize(Eigen::NoChange, m_positions.cols() + 1);
-    m_positions.col(m_positions.cols() - 1) = point;
+    m_trajPositions.conservativeResize(Eigen::NoChange,
+                                       m_trajPositions.cols() + 1);
+    m_trajPositions.col(m_trajPositions.cols() - 1) = point;
   }
 
   void addPoints(const std::vector<nanogui::Vector3f> &newPoints) {
@@ -218,11 +219,12 @@ public:
     nanogui::Matrix3f newRotation = pose.block<3, 3>(0, 0);
     nanogui::Vector3f newPoint = pose.block<3, 1>(0, 3);
 
-    m_positions.conservativeResize(Eigen::NoChange, m_positions.cols() + 1);
-    m_positions.col(m_positions.cols() - 1) = newPoint;
+    m_trajPositions.conservativeResize(Eigen::NoChange,
+                                       m_trajPositions.cols() + 1);
+    m_trajPositions.col(m_trajPositions.cols() - 1) = newPoint;
 
     m_trajShader.bind();
-    m_trajShader.uploadAttrib("position", m_positions);
+    m_trajShader.uploadAttrib("position", m_trajPositions);
 
     auto newCamVerts = nanogui::MatrixXf(3, 16);
     auto l = 0.35;
@@ -260,9 +262,9 @@ public:
             Eigen::AngleAxisf(0, Vector3f::UnitZ())) *
         0.25f;
 
-    Vector3f sceneMaxima = m_positions.rowwise().maxCoeff();
-    Vector3f sceneMinima = m_positions.rowwise().minCoeff();
-    Vector3f sceneMean = m_positions.rowwise().mean();
+    Vector3f sceneMaxima = m_trajPositions.rowwise().maxCoeff();
+    Vector3f sceneMinima = m_trajPositions.rowwise().minCoeff();
+    Vector3f sceneMean = m_trajPositions.rowwise().mean();
     Vector3f sceneCenter = (sceneMaxima + sceneMinima) / 2;
 
     // addPoint(sceneCenter);
@@ -348,7 +350,7 @@ public:
     }
 
     m_trajShader.bind();
-    m_trajShader.drawArray(GL_LINE_STRIP, 0, m_positions.cols());
+    m_trajShader.drawArray(GL_LINE_STRIP, 0, m_trajPositions.cols());
 
     m_camSymShader.bind();
     m_camSymShader.drawArray(GL_LINES, 0, m_cameraLines.cols());
@@ -364,7 +366,7 @@ public:
   }
 
 private:
-  nanogui::MatrixXf m_positions;
+  nanogui::MatrixXf m_trajPositions;
   nanogui::MatrixXf m_cameraLines;
   nanogui::MatrixXf m_gridLines;
   nanogui::MatrixXf m_points;
