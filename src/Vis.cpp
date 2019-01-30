@@ -181,6 +181,41 @@ void Vis::start() {
 
       // from exercise 1
       // [i].position = trajectoryInv * depthExtrinsicsInv * tmp;
+      /*
+      points_world = []
+
+      for yi in rows:
+        for xi in cols:
+            zi = image(xi, yi)
+            vec_i = vec3(xi, yi, zi)
+            vec_c = intrinsics^-1 * vec_i
+            vec_w = extrinsics^-1 * vec_c
+
+            points_world.append(vec_w)
+        */
+      int nChannels = leftDepth.channels();
+      int nRows = leftDepth.rows;
+      int nCols = leftDepth.cols * nChannels;
+
+      /*
+      if(leftDepth.isContinuous()) {
+        nCols *= nRows;
+        nRows = 1;
+      }
+      */
+
+      int i, j;
+      float *p_pixel;
+
+      for (i = 0; i < nRows; i++) {
+        p_pixel = leftDepth.ptr<float>(i);
+
+        for (j = 0; j < nCols; j++) {
+          float depth = p_pixel[j];
+          std::cout << "Depth at (" << i << "," << j << ") = " << depth
+                    << std::endl;
+        }
+      }
 
       m_view->addPose(absolutePose);
       m_view->addPoints(projectedPoints);
