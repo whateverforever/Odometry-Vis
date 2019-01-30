@@ -175,6 +175,15 @@ void Vis::start() {
 
       odometry::Affine4f absolutePose = keyframe.GetAbsoPose();
 
+      // clang-format off
+      Matrix4f swapYZ;
+      swapYZ << 1, 0, 0, 0,
+                0, 0, 1, 0,
+                0, 1, 0, 0,
+                0, 0, 0, 1;
+      // clang-format on
+      absolutePose = swapYZ * absolutePose;
+
       double min, max;
       cv::minMaxLoc(leftDepth, &min, &max);
 
@@ -207,7 +216,7 @@ void Vis::start() {
           Vector4f pointWorld = absolutePose * pointCamera;
 
           projectedPoints.push_back(
-              {pointWorld.x(), pointWorld.z(), pointWorld.y()});
+              {pointWorld.x(), pointWorld.y(), pointWorld.z()});
         }
       }
 
