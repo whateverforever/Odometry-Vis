@@ -377,14 +377,14 @@ public:
   }
 
 private:
-        nanogui::MatrixXf m_positions;
+  nanogui::MatrixXf m_positions;
   nanogui::MatrixXf m_cameraLines;
   nanogui::MatrixXf m_gridLines;
-  nanogui::MatrixXf m_points;
+    nanogui::MatrixXf m_points;
 
   nanogui::GLShader m_trajShader;
-  nanogui::GLShader m_camSymShader;
-  nanogui::GLShader m_gridShader;
+   nanogui::GLShader m_camSymShader;
+   nanogui::GLShader m_gridShader;
   nanogui::GLShader m_pointsShader;
 
   std::vector<nanogui::GLShader> m_shaders;
