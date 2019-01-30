@@ -170,50 +170,40 @@ void Vis::start() {
 
       odometry::Affine4f absolutePose = keyframe.GetAbsoPose();
 
-      std::vector<nanogui::Vector3f> projectedPoints = {
-          {0, 0, 0}, {1, 1, 1}, {2, 2, 2}, {3, 3, 3}};
-
       double min, max;
       cv::minMaxLoc(leftDepth, &min, &max);
 
       std::cout << "Depth Min/Max:" << min << "/" << max << std::endl;
       std::cout << "Depth Format:" << type2str(leftDepth.type()) << std::endl;
 
-      // from exercise 1
-      // [i].position = trajectoryInv * depthExtrinsicsInv * tmp;
-      /*
-      points_world = []
-
-      for yi in rows:
-        for xi in cols:
-            zi = image(xi, yi)
-            vec_i = vec3(xi, yi, zi)
-            vec_c = intrinsics^-1 * vec_i
-            vec_w = extrinsics^-1 * vec_c
-
-            points_world.append(vec_w)
-        */
       int nChannels = leftDepth.channels();
       int nRows = leftDepth.rows;
       int nCols = leftDepth.cols * nChannels;
 
-      /*
-      if(leftDepth.isContinuous()) {
-        nCols *= nRows;
-        nRows = 1;
-      }
-      */
-
-      int i, j;
+      int yi, xi;
       float *p_pixel;
 
-      for (i = 0; i < nRows; i++) {
-        p_pixel = leftDepth.ptr<float>(i);
+      std::vector<nanogui::Vector3f> projectedPoints;
 
-        for (j = 0; j < nCols; j++) {
-          float depth = p_pixel[j];
-          std::cout << "Depth at (" << i << "," << j << ") = " << depth
-                    << std::endl;
+      for (yi = 0; yi < nRows; yi++) {
+        p_pixel = leftDepth.ptr<float>(yi);
+
+        for (xi = 0; xi < nCols; xi++) {
+          float zi = p_pixel[xi];
+          // std::cout << "Depth at (" << yi << "," << xi << ") = " << zi
+          //           << std::endl;
+
+          if (zi == 0) {
+            continue;
+          }
+
+          nanogui::Vector4f pointImage(xi, yi, zi, 1);
+          nanogui::Vector4f pointCamera =
+              m_intrinsics.inverse() * pointImage; // TODO: Replace inverse()
+          nanogui::Vector4f pointWorld = absolutePose.inverse() * pointCamera;
+
+          projectedPoints.push_back(
+              {pointWorld.x(), pointWorld.y(), pointWorld.z()});
         }
       }
 
