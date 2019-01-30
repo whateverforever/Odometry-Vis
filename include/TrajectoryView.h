@@ -32,14 +32,13 @@ public:
 
         /* Vertex shader */
         "#version 330\n"
-        "uniform mat4 modelMatrix;\n"
         "uniform mat4 viewMatrix;\n"
         "uniform mat4 projMatrix;\n"
         "in vec3 position;\n"
         "out vec4 frag_color;\n"
         "void main() {\n"
         "    frag_color = vec4(0.7, 0.7, 0.7, 1.0);\n"
-        "    gl_Position = projMatrix * viewMatrix * modelMatrix * "
+        "    gl_Position = projMatrix * viewMatrix * "
         "vec4(position, 1.0);\n"
         "}",
 
@@ -57,14 +56,13 @@ public:
 
         /* Vertex shader */
         "#version 330\n"
-        "uniform mat4 modelMatrix;\n"
         "uniform mat4 viewMatrix;\n"
         "uniform mat4 projMatrix;\n"
         "in vec3 position;\n"
         "out vec4 frag_color;\n"
         "void main() {\n"
         "    frag_color = vec4(1.0, 1.0, 1.0, 1.0);\n"
-        "    gl_Position = projMatrix * viewMatrix * modelMatrix * "
+        "    gl_Position = projMatrix * viewMatrix * "
         "vec4(position, 1.0);\n"
         "}",
 
@@ -342,9 +340,6 @@ public:
 
     for (auto shader : m_shaders) {
       shader.bind();
-      if (shader.uniform("modelMatrix") > -1) {
-        shader.setUniform("modelMatrix", modelMatrix);
-      }
       shader.setUniform("viewMatrix", viewMatrix);
       shader.setUniform("projMatrix", projMatrix);
     }
