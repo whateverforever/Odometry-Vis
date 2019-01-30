@@ -1,4 +1,5 @@
 #include <Vis.h>
+#include <string> // TODO: Remove
 
 GLuint getTextureId() {
   GLuint imageTexId;
@@ -39,6 +40,46 @@ Vis::Vis(float fx, float fy, float f_theta, float cx, float cy) {
 
 void Vis::loadNewestKeyframe(const odometry::KeyFrame &keyframe) {
   m_keyframeBuffer.push_back(keyframe);
+}
+
+// TODO: Remove
+std::string type2str(int type) {
+  std::string r;
+
+  uchar depth = type & CV_MAT_DEPTH_MASK;
+  uchar chans = 1 + (type >> CV_CN_SHIFT);
+
+  switch (depth) {
+  case CV_8U:
+    r = "8U";
+    break;
+  case CV_8S:
+    r = "8S";
+    break;
+  case CV_16U:
+    r = "16U";
+    break;
+  case CV_16S:
+    r = "16S";
+    break;
+  case CV_32S:
+    r = "32S";
+    break;
+  case CV_32F:
+    r = "32F";
+    break;
+  case CV_64F:
+    r = "64F";
+    break;
+  default:
+    r = "User";
+    break;
+  }
+
+  r += "C";
+  r += (chans + '0');
+
+  return r;
 }
 
 void Vis::start() {
@@ -124,13 +165,22 @@ void Vis::start() {
       bindMatToTexture(leftRGB, m_rgbLeftTexId);
       bindMatToTexture(rightRGB, m_rgbRightTexId);
 
-      cv::Mat leftDepth = keyframe.GetLeftDep();
+      cv::Mat leftDepth = keyframe.GetLeftDep(); // 32FC1, min/max:0/9.87
       cv::Mat leftValue = keyframe.GetLeftVal();
 
       odometry::Affine4f absolutePose = keyframe.GetAbsoPose();
 
       std::vector<nanogui::Vector3f> projectedPoints = {
           {0, 0, 0}, {1, 1, 1}, {2, 2, 2}, {3, 3, 3}};
+
+      double min, max;
+      cv::minMaxLoc(leftDepth, &min, &max);
+
+      std::cout << "Depth Min/Max:" << min << "/" << max << std::endl;
+      std::cout << "Depth Format:" << type2str(leftDepth.type()) << std::endl;
+
+      // from exercise 1
+      // [i].position = trajectoryInv * depthExtrinsicsInv * tmp;
 
       m_view->addPose(absolutePose);
       m_view->addPoints(projectedPoints);

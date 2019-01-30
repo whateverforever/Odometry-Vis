@@ -57,7 +57,7 @@ private:
    * during the life time of odometry system ***/
   std::shared_ptr<cv::Mat> left_img_ptr_;
   std::shared_ptr<cv::Mat> right_img_ptr_;
-  std::shared_ptr<cv::Mat> left_dep_ptr_;
+  std::shared_ptr<cv::Mat> left_dep_ptr_; // 32FC1
   std::shared_ptr<cv::Mat> left_val_ptr_;
   Affine4f abso_pose_;
 };
