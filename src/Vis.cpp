@@ -176,6 +176,7 @@ void Vis::start() {
       odometry::Affine4f absolutePose = keyframe.GetAbsoPose();
 
       // clang-format off
+      // Swapping Y and Z to convert coordinates to a right-hand system
       Matrix4f swapYZ;
       swapYZ << 1, 0, 0, 0,
                 0, 0, 1, 0,
