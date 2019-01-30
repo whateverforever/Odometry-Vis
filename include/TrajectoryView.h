@@ -172,8 +172,9 @@ public:
   }
 
   ~TrajectoryView() {
-    m_trajShader.free();
-    m_camSymShader.free();
+    for (auto shader : m_shaders) {
+      shader.free();
+    }
   }
 
   void setRotation(nanogui::Vector3f vRotation) { m_Rotation = vRotation; }
