@@ -76,6 +76,29 @@ public:
         "    color = frag_color;\n"
         "}");
 
+    m_pointsShader.init(
+        "projected_points_shader",
+        /* Vertex shader */
+        "#version 330\n"
+        "uniform mat4 viewMatrix;\n"
+        "uniform mat4 projMatrix;\n"
+        "in vec3 position;\n"
+        "out vec4 frag_color;\n"
+        "void main() {\n"
+        "    gl_PointSize = 5.0;\n"
+        "    frag_color = vec4(1.0, 1.0, 1.0, 1.0);\n"
+        "    gl_Position = projMatrix * viewMatrix * "
+        "vec4(position, 1.0);\n"
+        "}",
+
+        /* Fragment shader */
+        "#version 330\n"
+        "out vec4 color;\n"
+        "in vec4 frag_color;\n"
+        "void main() {\n"
+        "    color = frag_color;\n"
+        "}");
+
     m_gridShader.init("coordinate_grid_shader",
                       /* Vertex shader */
                       "#version 330\n"
@@ -120,7 +143,8 @@ public:
     m_shaders = {
         m_trajShader,
         m_camSymShader,
-        m_gridShader
+        m_gridShader,
+        m_pointsShader
     };
 
     std::cout << "Grid lines:\n" << m_gridLines << std::endl;
@@ -187,6 +211,9 @@ public:
         m_points.col(numExistingPoints + i) = newPoints[i];
       }
 
+      m_pointsShader.bind();
+      m_pointsShader.uploadAttrib("position", m_points);
+
       std::cout << "Added new bunch of points:\n" << m_points << std::endl;
   }
 
@@ -223,6 +250,7 @@ public:
   virtual void drawGL() override {
     using namespace nanogui;
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_PROGRAM_POINT_SIZE);
 
     float fTime = (float)glfwGetTime();
 
@@ -341,6 +369,10 @@ public:
     m_gridShader.bind();
     m_gridShader.drawArray(GL_LINES, 0, m_gridLines.cols());
 
+    m_pointsShader.bind();
+    m_pointsShader.drawArray(GL_POINTS, 0, m_points.cols());
+
+    glDisable(GL_PROGRAM_POINT_SIZE);
     glDisable(GL_DEPTH_TEST);
   }
 
@@ -353,6 +385,7 @@ private:
   nanogui::GLShader m_trajShader;
   nanogui::GLShader m_camSymShader;
   nanogui::GLShader m_gridShader;
+  nanogui::GLShader m_pointsShader;
 
   std::vector<nanogui::GLShader> m_shaders;
 
