@@ -118,9 +118,9 @@ void Vis::start() {
 
   Button *b1 = new Button(imageWindow2, "Random Rotation");
   b1->setCallback([trajectoryView, this]() {
-    trajectoryView->setRotation(nanogui::Vector3f((rand() % 100) / 100.0f,
-                                                  (rand() % 100) / 100.0f,
-                                                  (rand() % 100) / 100.0f));
+    trajectoryView->setRotation(Vector3f((rand() % 100) / 100.0f,
+                                         (rand() % 100) / 100.0f,
+                                         (rand() % 100) / 100.0f));
   });
 
   Button *b_zoom = new Button(imageWindow2, "Increase Zoom");
@@ -183,7 +183,7 @@ void Vis::start() {
       int yi, xi;
       float *p_pixel;
 
-      std::vector<nanogui::Vector3f> projectedPoints;
+      std::vector<Vector3f> projectedPoints;
 
       for (yi = 0; yi < nRows; yi++) {
         p_pixel = leftDepth.ptr<float>(yi);
@@ -197,13 +197,13 @@ void Vis::start() {
             continue;
           }
 
-          nanogui::Vector4f pointImage(xi, yi, zi, 1);
-          nanogui::Vector4f pointCamera =
+          Vector4f pointImage(xi, yi, zi, 1);
+          Vector4f pointCamera =
               m_intrinsics.inverse() * pointImage; // TODO: Replace inverse()
-          nanogui::Vector4f pointWorld = absolutePose.inverse() * pointCamera;
+          Vector4f pointWorld = absolutePose * pointCamera;
 
           projectedPoints.push_back(
-              {pointWorld.x(), pointWorld.y(), pointWorld.z()});
+              {pointWorld.x(), pointWorld.z(), pointWorld.y()});
         }
       }
 

@@ -211,7 +211,7 @@ public:
     m_pointsShader.bind();
     m_pointsShader.uploadAttrib("position", m_points);
 
-    std::cout << "Added new bunch of points:\n" << m_points << std::endl;
+    // std::cout << "Added new bunch of points:\n" << m_points << std::endl;
   }
 
   void addPose(odometry::Affine4f pose) {
