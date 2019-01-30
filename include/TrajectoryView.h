@@ -225,7 +225,7 @@ public:
     m_trajShader.uploadAttrib("position", m_trajPositions);
 
     auto newCamVerts = nanogui::MatrixXf(3, 16);
-    auto l = 0.35;
+    auto l = 0.1;
 
     // clang-format off
     newCamVerts <<  0,   l,   0,   l,   0,  -l,   0,  -l,   l,   l,   l,  -l,  -l,  -l,  -l,   l,

@@ -175,14 +175,10 @@ void Vis::start() {
 
       odometry::Affine4f absolutePose = keyframe.GetAbsoPose();
 
-      // clang-format off
       // Swapping Y and Z to convert coordinates to a right-hand system
       Matrix4f swapYZ;
-      swapYZ << 1, 0, 0, 0,
-                0, 0, 1, 0,
-                0, 1, 0, 0,
-                0, 0, 0, 1;
-      // clang-format on
+      swapYZ.block<3, 3>(0, 0) =
+          Eigen::AngleAxisf(-3.14 / 2, Vector3f::UnitX()).toRotationMatrix();
       absolutePose = swapYZ * absolutePose;
 
       double min, max;
