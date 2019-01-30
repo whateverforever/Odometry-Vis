@@ -1,4 +1,5 @@
 #include <Vis.h>
+#include <string> // TODO: Remove
 
 GLuint getTextureId() {
   GLuint imageTexId;
@@ -24,10 +25,61 @@ void bindMatToTexture(const cv::Mat &image, GLuint textureId) {
                   GL_UNSIGNED_BYTE, image.ptr());
 }
 
-Vis::Vis() { m_lastFrameTime = glfwGetTime(); }
+Vis::Vis(float fx, float fy, float f_theta, float cx, float cy) {
+  m_lastFrameTime = glfwGetTime();
+
+  // clang-format off
+  m_intrinsics = nanogui::Matrix4f::Identity();
+  m_intrinsics <<   fx, f_theta, cx, 0,
+                    0,       fy, cy, 0,
+                    0,        0,  1, 0,
+                    0,        0,  0, 1;
+  // clang-format on
+  std::cout << "Set intrinsics:\n" << m_intrinsics << std::endl;
+}
 
 void Vis::loadNewestKeyframe(const odometry::KeyFrame &keyframe) {
   m_keyframeBuffer.push_back(keyframe);
+}
+
+// TODO: Remove
+std::string type2str(int type) {
+  std::string r;
+
+  uchar depth = type & CV_MAT_DEPTH_MASK;
+  uchar chans = 1 + (type >> CV_CN_SHIFT);
+
+  switch (depth) {
+  case CV_8U:
+    r = "8U";
+    break;
+  case CV_8S:
+    r = "8S";
+    break;
+  case CV_16U:
+    r = "16U";
+    break;
+  case CV_16S:
+    r = "16S";
+    break;
+  case CV_32S:
+    r = "32S";
+    break;
+  case CV_32F:
+    r = "32F";
+    break;
+  case CV_64F:
+    r = "64F";
+    break;
+  default:
+    r = "User";
+    break;
+  }
+
+  r += "C";
+  r += (chans + '0');
+
+  return r;
 }
 
 void Vis::start() {
@@ -66,29 +118,29 @@ void Vis::start() {
 
   Button *b1 = new Button(imageWindow2, "Random Rotation");
   b1->setCallback([trajectoryView, this]() {
-    trajectoryView->setRotation(nanogui::Vector3f((rand() % 100) / 100.0f,
-                                                  (rand() % 100) / 100.0f,
-                                                  (rand() % 100) / 100.0f));
+    trajectoryView->setRotation(Vector3f((rand() % 100) / 100.0f,
+                                         (rand() % 100) / 100.0f,
+                                         (rand() % 100) / 100.0f));
   });
 
   Button *b_zoom = new Button(imageWindow2, "Increase Zoom");
-  b_zoom->setCallback([trajectoryView](){
-      auto zoom = trajectoryView->getZoom();
+  b_zoom->setCallback([trajectoryView]() {
+    auto zoom = trajectoryView->getZoom();
 
-      trajectoryView->setZoom(zoom * 1.1);
+    trajectoryView->setZoom(zoom * 1.1);
   });
 
   Button *b_zoom2 = new Button(imageWindow2, "Decrease Zoom");
-  b_zoom2->setCallback([trajectoryView](){
-      auto zoom = trajectoryView->getZoom();
+  b_zoom2->setCallback([trajectoryView]() {
+    auto zoom = trajectoryView->getZoom();
 
-      trajectoryView->setZoom(zoom * 0.9);
+    trajectoryView->setZoom(zoom * 0.9);
   });
 
   Button *b_addPoint = new Button(imageWindow2, "Add outlier point");
-  b_addPoint->setCallback([trajectoryView](){
-      auto newPoint = Vector3f(10, 0, 10);
-      trajectoryView->addPoint(newPoint);
+  b_addPoint->setCallback([trajectoryView]() {
+    auto newPoint = Vector3f(10, 0, 10);
+    trajectoryView->addPoint(newPoint);
   });
 
   // Use redraw to reload images & points from data sources
@@ -113,12 +165,50 @@ void Vis::start() {
       bindMatToTexture(leftRGB, m_rgbLeftTexId);
       bindMatToTexture(rightRGB, m_rgbRightTexId);
 
-      cv::Mat leftDepth = keyframe.GetLeftDep();
+      cv::Mat leftDepth = keyframe.GetLeftDep(); // 32FC1, min/max:0/9.87
       cv::Mat leftValue = keyframe.GetLeftVal();
 
       odometry::Affine4f absolutePose = keyframe.GetAbsoPose();
 
+      double min, max;
+      cv::minMaxLoc(leftDepth, &min, &max);
+
+      std::cout << "Depth Min/Max:" << min << "/" << max << std::endl;
+      std::cout << "Depth Format:" << type2str(leftDepth.type()) << std::endl;
+
+      int nChannels = leftDepth.channels();
+      int nRows = leftDepth.rows;
+      int nCols = leftDepth.cols * nChannels;
+
+      int yi, xi;
+      float *p_pixel;
+
+      std::vector<Vector3f> projectedPoints;
+
+      for (yi = 0; yi < nRows; yi++) {
+        p_pixel = leftDepth.ptr<float>(yi);
+
+        for (xi = 0; xi < nCols; xi++) {
+          float zi = p_pixel[xi];
+          // std::cout << "Depth at (" << yi << "," << xi << ") = " << zi
+          //           << std::endl;
+
+          if (zi == 0) {
+            continue;
+          }
+
+          Vector4f pointImage(xi, yi, zi, 1);
+          Vector4f pointCamera =
+              m_intrinsics.inverse() * pointImage; // TODO: Replace inverse()
+          Vector4f pointWorld = absolutePose * pointCamera;
+
+          projectedPoints.push_back(
+              {pointWorld.x(), pointWorld.z(), pointWorld.y()});
+        }
+      }
+
       m_view->addPose(absolutePose);
+      m_view->addPoints(projectedPoints);
     }
 
     m_keyframeBuffer.clear();

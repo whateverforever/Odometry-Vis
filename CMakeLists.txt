@@ -26,6 +26,7 @@ add_library(${APP_LIB} STATIC
     src/VisScreen.cpp
     src/Keyframe.cpp
     src/DataGen.cpp
+    src/MockCameraInput.cpp
     )
 add_executable(${APP_EXE} src/main.cpp)
 
