@@ -377,7 +377,7 @@ public:
   }
 
 private:
-  nanogui::MatrixXf m_positions;
+        nanogui::MatrixXf m_positions;
   nanogui::MatrixXf m_cameraLines;
   nanogui::MatrixXf m_gridLines;
   nanogui::MatrixXf m_points;
