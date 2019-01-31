@@ -23,15 +23,22 @@ void bindMatToTexture(const cv::Mat &image, GLuint textureId,
                       bool grayscale = false) {
   glBindTexture(GL_TEXTURE_2D, textureId);
 
+  uint imageColor;
+  uint dataFormat;
+
   if (grayscale) {
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, image.cols, image.rows, GL_RED,
-                    GL_FLOAT, image.ptr());
+    imageColor = GL_RED;
+    dataFormat = GL_FLOAT;
+
     GLint swizzleMask[] = {GL_RED, GL_RED, GL_RED, GL_ZERO};
     glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
   } else {
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, image.cols, image.rows, GL_BGR,
-                    GL_UNSIGNED_BYTE, image.ptr());
+    imageColor = GL_BGR;
+    dataFormat = GL_UNSIGNED_BYTE;
   }
+
+  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, image.cols, image.rows, imageColor,
+                  dataFormat, image.ptr());
 }
 
 Vis::Vis(float fx, float fy, float f_theta, float cx, float cy) {
