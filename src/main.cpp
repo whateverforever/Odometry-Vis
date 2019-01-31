@@ -14,7 +14,14 @@
 
 int main(int /* argc */, char ** /* argv */) {
   // parameters of the freiburg camera
-  float fx = 535.4, fy = 539.2, f_theta = 0, cx = 320.1, cy = 247.6;
+  // float fx = 535.4, fy = 539.2, f_theta = 0, cx = 320.1, cy = 247.6;
+
+  // params for kitti
+  float fx = 718.856;
+  float fy = fx;
+  float f_theta = 0;
+  float cx = 607.1928;
+  float cy = 185.2157;
 
   auto myUI = new Vis(fx, fy, f_theta, cx, cy);
   // auto dataGenerator = new DataGenerator();
