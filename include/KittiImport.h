@@ -130,7 +130,7 @@ void KittiImport::load_data(std::string filename, std::vector<cv::Mat> &gray,
         std::exit(-1);
       }
 
-      depth_img.convertTo(depth[counter], PixelType, 1.0f / 5000.0f);
+      depth_img.convertTo(depth[counter], PixelType, 1.0f / 386.1448f);
       // <-
 
       // -> load mask
