@@ -28,17 +28,19 @@ int main(int /* argc */, char ** /* argv */) {
   // auto mockCamera = new MockCameraInput();
   auto kittiImporter = new KittiImport();
 
-  std::thread dataThread([myUI]() {
+  std::thread dataThread([kittiImporter, myUI]() {
     while (true) {
       // Getting the image from the camera, calculating the depth etc all
       // happens here dataGenerator is basically the last link in the chain:
       // Odometry auto latestKeyframe = dataGenerator->getLatestKeyframe();
 
-      // auto latestKeyframe = mockCamera->getLatestKeyframe();
+      auto latestKeyframe = kittiImporter->getLatestKeyframe();
 
-      // myUI->loadNewestKeyframe(latestKeyframe);
+      std::cout << "Got latest keyframe" << std::endl;
 
-      std::this_thread::sleep_for(std::chrono::milliseconds(300));
+      myUI->loadNewestKeyframe(latestKeyframe);
+
+      std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     }
   });
 

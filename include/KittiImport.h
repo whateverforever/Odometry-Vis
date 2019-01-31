@@ -38,7 +38,8 @@ private:
 };
 
 KittiImport::KittiImport()
-    : m_poses(7, N_FRAMES), m_gray(N_FRAMES), m_depth(N_FRAMES) {
+    : m_poses(7, N_FRAMES), m_gray(N_FRAMES), m_mask(N_FRAMES),
+      m_depth(N_FRAMES) {
 
   m_lastFrameIdx = 0;
   load_data(DATA_PATH_KITTI + "/associated.txt", m_gray, m_depth, m_mask,
