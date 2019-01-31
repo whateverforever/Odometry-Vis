@@ -229,7 +229,8 @@ void Vis::start() {
       Matrix4f swapYZ;
       swapYZ.block<3, 3>(0, 0) =
           Eigen::AngleAxisf(-3.14 / 2, Vector3f::UnitX()).toRotationMatrix();
-      absolutePose = swapYZ * absolutePose;
+      // absolutePose = swapYZ * absolutePose; // TODO: remove, commented out
+      // for kitti
 
       int nChannels = leftDepth.channels();
       int nRows = leftDepth.rows;
