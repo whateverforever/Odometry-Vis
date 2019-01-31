@@ -34,7 +34,13 @@ odometry::KeyFrame MockCameraInput::getLatestKeyframe() {
 
   m_lastFrameIdx += 1;
 
-  return odometry::KeyFrame(p_leftRGB, p_leftRGB, p_leftDepth, p_leftRGB, pose);
+  cv::Mat depthMask(rgbImage.size(), CV_8UC1);
+  cv::randu(depthMask, 0, 2);
+
+  auto p_depthMask = std::make_shared<cv::Mat>(depthMask);
+
+  return odometry::KeyFrame(p_leftRGB, p_leftRGB, p_leftDepth, p_depthMask,
+                            pose);
 }
 
 void MockCameraInput::load_data(std::string filename,
