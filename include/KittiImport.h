@@ -131,8 +131,8 @@ void KittiImport::load_data(std::string filename, std::vector<cv::Mat> &gray,
 
       depth_img.convertTo(depth[counter], PixelType, 1.0f / 386.1448f);
 
-      cv::namedWindow("keypoints", cv::WINDOW_NORMAL);
-      cv::imshow("keypoints", depth[counter]);
+      cv::namedWindow("depth", cv::WINDOW_NORMAL);
+      cv::imshow("depth", depth[counter]);
       cv::waitKey(0);
       // <-
 
@@ -146,6 +146,9 @@ void KittiImport::load_data(std::string filename, std::vector<cv::Mat> &gray,
       }
 
       mask_16u.convertTo(mask[counter], CV_8UC1); // one channel for binary vals
+      cv::namedWindow("mask", cv::WINDOW_NORMAL);
+      cv::imshow("mask", mask[counter]);
+      cv::waitKey(0);
       // <-
 
       // -> pose
