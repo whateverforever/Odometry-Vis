@@ -30,7 +30,7 @@ add_library(${APP_LIB} STATIC
     )
 add_executable(${APP_EXE} src/main.cpp)
 
-target_link_libraries(${APP_LIB} nanogui ${NANOGUI_EXTRA_LIBS} opencv_imgcodecs)
+target_link_libraries(${APP_LIB} nanogui ${NANOGUI_EXTRA_LIBS} opencv_imgcodecs opencv_highgui)
 target_link_libraries(${APP_EXE} ${APP_LIB})
 
 # Absolutely needed for the parent not to forget nanogui, eigen, etc...

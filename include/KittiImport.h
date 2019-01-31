@@ -9,6 +9,7 @@
 #include <Eigen/Geometry>
 
 #include <opencv2/core.hpp>
+#include <opencv2/highgui/highgui.hpp> // TODO: remove, debugging
 #include <opencv2/imgcodecs.hpp>
 
 #include <DataGen.h> //for random float
@@ -129,6 +130,10 @@ void KittiImport::load_data(std::string filename, std::vector<cv::Mat> &gray,
       }
 
       depth_img.convertTo(depth[counter], PixelType, 1.0f / 386.1448f);
+
+      cv::namedWindow("keypoints", cv::WINDOW_NORMAL);
+      cv::imshow("keypoints", depth[counter]);
+      cv::waitKey(0);
       // <-
 
       // -> load mask
