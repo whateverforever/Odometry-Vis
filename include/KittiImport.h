@@ -57,8 +57,6 @@ odometry::KeyFrame KittiImport::getLatestKeyframe() {
   cv::Mat rgbLeft = cv::Mat::zeros(376, 1241, CV_8UC3);
 
   // convert to rgb
-  std::cout << "gray:\n" << m_gray[m_lastFrameIdx] << std::endl;
-
   cv::cvtColor(m_gray[m_lastFrameIdx], rgbLeft, cv::COLOR_GRAY2BGR);
   rgbLeft.convertTo(rgbLeft, CV_8UC3);
 
@@ -123,7 +121,7 @@ void KittiImport::load_data(std::string filename, std::vector<cv::Mat> &gray,
       // -> load depth
       std::string filename_depth =
           std::string(DATA_PATH_KITTI + "/") + nameDepth;
-      cv::Mat depth_img = cv::imread(filename_depth, cv::IMREAD_UNCHANGED);
+      cv::Mat depth_img = cv::imread(filename_depth, CV_16U);
 
       if (depth_img.empty()) {
         std::cout << "read depth img failed for: " << counter << std::endl;

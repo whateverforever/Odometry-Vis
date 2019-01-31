@@ -215,6 +215,8 @@ void Vis::start() {
       cv::Mat leftDepth = keyframe.GetLeftDep(); // 32FC1, min/max:0/9.87
       cv::Mat leftValue = keyframe.GetLeftVal(); // 8UC1, mask for depth
 
+      std::cout << "Depth is " << type2str(leftDepth.type()) << std::endl;
+
       cv::Mat depthColored;
       singleChannelToColorMap(leftDepth, depthColored, 0.2, 4.0);
 
