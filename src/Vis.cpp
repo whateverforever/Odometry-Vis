@@ -95,6 +95,13 @@ void Vis::start() {
   screen->setLayout(
       new BoxLayout(Orientation::Horizontal, Alignment::Middle, 10, 10));
 
+  // Reserve some Textures for later images
+  m_rgbLeftTexId = getTextureId();
+  m_rgbRightTexId = getTextureId();
+  m_depthLeftTexId = getTextureId();
+
+  /* Left Window with Camera Images */
+
   auto rgbImageWindow = new Window(screen, "RGB");
   rgbImageWindow->setLayout(
       new BoxLayout(Orientation::Vertical, Alignment::Middle, 5, 5));
@@ -102,11 +109,6 @@ void Vis::start() {
   Widget *firstRow = new Widget(rgbImageWindow);
   firstRow->setLayout(
       new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 6));
-
-  // Reserve some Textures for later images
-  m_rgbLeftTexId = getTextureId();
-  m_rgbRightTexId = getTextureId();
-  m_depthLeftTexId = getTextureId();
 
   auto rgbLeftView = new ImageView(firstRow, m_rgbLeftTexId);
   rgbLeftView->setFixedSize({300, 200});
@@ -119,6 +121,8 @@ void Vis::start() {
 
   auto depthView = new ImageView(secondRow, m_depthLeftTexId);
   depthView->setFixedSize({300, 200});
+  auto overlayedView = new ImageView(secondRow, m_rgbRightTexId);
+  overlayedView->setFixedSize({300, 200});
 
   // To test layouting...
   auto viewportWindow = new Window(screen, "Viewport");
