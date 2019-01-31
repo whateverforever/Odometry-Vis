@@ -21,4 +21,4 @@ To get to run the example (main.cpp), clone this repository with its submodules:
 
 ## Current State
 
-![Latest screenshot](docs/latest.gif)
+![Latest screenshot](docs/latest.png)

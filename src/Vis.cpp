@@ -19,10 +19,43 @@ GLuint getTextureId() {
   return imageTexId;
 }
 
-void bindMatToTexture(const cv::Mat &image, GLuint textureId) {
+void singleChannelToColorMap(const cv::Mat &inImg, cv::Mat &outImage,
+                             double minVal, double maxVal) {
+  cv::Mat tmpImage;
+
+  inImg.convertTo(tmpImage, CV_8UC1, 255 / (maxVal - minVal),
+                  -255 * minVal / (maxVal - minVal));
+
+  applyColorMap(tmpImage, outImage, cv::COLORMAP_PARULA);
+}
+
+void bindMatToTexture(const cv::Mat &image, GLuint textureId,
+                      bool colorMap = false) {
   glBindTexture(GL_TEXTURE_2D, textureId);
-  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, image.cols, image.rows, GL_BGR,
-                  GL_UNSIGNED_BYTE, image.ptr());
+
+  uint imageColor;
+  uint dataFormat;
+
+  cv::Mat tmpImage;
+  cv::Mat colorMappedImage;
+
+  if (colorMap) {
+    // Manually set min/max to fit the important data (<4m for teddy) into the
+    // 8UC1
+    double minVal = 0.2;
+    double maxVal = 4;
+
+    singleChannelToColorMap(image, colorMappedImage, minVal, maxVal);
+  } else {
+    colorMappedImage = image;
+  }
+
+  imageColor = GL_BGR;
+  dataFormat = GL_UNSIGNED_BYTE;
+
+  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, colorMappedImage.cols,
+                  colorMappedImage.rows, imageColor, dataFormat,
+                  colorMappedImage.ptr());
 }
 
 Vis::Vis(float fx, float fy, float f_theta, float cx, float cy) {
@@ -91,58 +124,68 @@ void Vis::start() {
   using namespace nanogui;
 
   nanogui::init();
-  auto screen = new VisScreen({1000, 750}, "NanoGUI test");
+  VisScreen *screen = new VisScreen({1280, 720}, "NanoGUI test");
   screen->setLayout(
       new BoxLayout(Orientation::Horizontal, Alignment::Middle, 10, 10));
-
-  auto rgbImageWindow = new Window(screen, "RGB");
-  rgbImageWindow->setLayout(
-      new BoxLayout(Orientation::Horizontal, Alignment::Middle, 5, 5));
 
   // Reserve some Textures for later images
   m_rgbLeftTexId = getTextureId();
   m_rgbRightTexId = getTextureId();
-  m_depthLeftTexId = getTextureId();
 
-  auto rgbLeftView = new ImageView(rgbImageWindow, m_rgbLeftTexId);
-  rgbLeftView->setFixedSize({300, 200});
+  /* Left Window with Camera Images */
 
-  auto rgbRightView = new ImageView(rgbImageWindow, m_rgbRightTexId);
-  rgbRightView->setFixedSize({300, 200});
+  auto rgbImageWindow = new Window(screen, "RGB");
+  rgbImageWindow->setLayout(
+      new BoxLayout(Orientation::Vertical, Alignment::Middle, 5, 5));
+
+  Widget *firstRow = new Widget(rgbImageWindow);
+  firstRow->setLayout(
+      new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 6));
+
+  auto rgbLeftView = new ImageView(firstRow, m_rgbLeftTexId);
+  rgbLeftView->setFixedSize({400, 300});
+  // Weird nanogui behaviour, see
+  // https://nanogui.readthedocs.io/en/latest/api/class_nanogui__Widget.html?highlight=widget#_CPPv2N7nanogui6Widget12setFixedSizeERK8Vector2i
+  rgbLeftView->setSize(rgbLeftView->fixedSize());
+  rgbLeftView->fit();
+  auto rgbRightView = new ImageView(firstRow, m_rgbRightTexId);
+  rgbRightView->setFixedSize({400, 300});
+  rgbRightView->setSize(rgbRightView->fixedSize());
+  rgbRightView->fit();
 
   // To test layouting...
-  auto imageWindow2 = new Window(screen, "RGB Right");
-  imageWindow2->setLayout(
+  auto viewportWindow = new Window(screen, "Viewport");
+  viewportWindow->setLayout(
       new BoxLayout(Orientation::Vertical, Alignment::Middle, 5, 5));
 
   // Display the 3d trajectory
-  auto trajectoryView = new TrajectoryView(imageWindow2);
+  auto trajectoryView = new TrajectoryView(viewportWindow);
   m_view = trajectoryView;
 
   trajectoryView->setSize({400, 400});
 
-  Button *b1 = new Button(imageWindow2, "Random Rotation");
+  Button *b1 = new Button(viewportWindow, "Random Rotation");
   b1->setCallback([trajectoryView, this]() {
     trajectoryView->setRotation(Vector3f((rand() % 100) / 100.0f,
                                          (rand() % 100) / 100.0f,
                                          (rand() % 100) / 100.0f));
   });
 
-  Button *b_zoom = new Button(imageWindow2, "Increase Zoom");
+  Button *b_zoom = new Button(viewportWindow, "Increase Zoom");
   b_zoom->setCallback([trajectoryView]() {
     auto zoom = trajectoryView->getZoom();
 
     trajectoryView->setZoom(zoom * 1.1);
   });
 
-  Button *b_zoom2 = new Button(imageWindow2, "Decrease Zoom");
+  Button *b_zoom2 = new Button(viewportWindow, "Decrease Zoom");
   b_zoom2->setCallback([trajectoryView]() {
     auto zoom = trajectoryView->getZoom();
 
     trajectoryView->setZoom(zoom * 0.9);
   });
 
-  Button *b_addPoint = new Button(imageWindow2, "Add outlier point");
+  Button *b_addPoint = new Button(viewportWindow, "Add outlier point");
   b_addPoint->setCallback([trajectoryView]() {
     auto newPoint = Vector3f(10, 0, 10);
     trajectoryView->addPoint(newPoint);
@@ -162,16 +205,22 @@ void Vis::start() {
     m_numElapsedFrames += 1;
     /******** </FPS> ********/
 
+    std::cout << "Going to draw " << m_keyframeBuffer.size() << " keyframes.."
+              << std::endl;
     // Draw buffered keyframes
     for (odometry::KeyFrame &keyframe : m_keyframeBuffer) {
       cv::Mat leftRGB = keyframe.GetLeftImg();
       cv::Mat rightRGB = keyframe.GetRightImg();
+      cv::Mat leftDepth = keyframe.GetLeftDep(); // 32FC1, min/max:0/9.87
+      cv::Mat leftValue = keyframe.GetLeftVal(); // 8UC1, mask for depth
+
+      cv::Mat depthColored;
+      singleChannelToColorMap(leftDepth, depthColored, 0.2, 4.0);
+
+      depthColored.copyTo(leftRGB, leftValue);
 
       bindMatToTexture(leftRGB, m_rgbLeftTexId);
       bindMatToTexture(rightRGB, m_rgbRightTexId);
-
-      cv::Mat leftDepth = keyframe.GetLeftDep(); // 32FC1, min/max:0/9.87
-      cv::Mat leftValue = keyframe.GetLeftVal();
 
       odometry::Affine4f absolutePose = keyframe.GetAbsoPose();
 
@@ -181,12 +230,6 @@ void Vis::start() {
           Eigen::AngleAxisf(-3.14 / 2, Vector3f::UnitX()).toRotationMatrix();
       absolutePose = swapYZ * absolutePose;
 
-      double min, max;
-      cv::minMaxLoc(leftDepth, &min, &max);
-
-      std::cout << "Depth Min/Max:" << min << "/" << max << std::endl;
-      std::cout << "Depth Format:" << type2str(leftDepth.type()) << std::endl;
-
       int nChannels = leftDepth.channels();
       int nRows = leftDepth.rows;
       int nCols = leftDepth.cols * nChannels;
@@ -195,6 +238,10 @@ void Vis::start() {
       float *p_pixel;
 
       std::vector<Vector3f> projectedPoints;
+
+      // Parameter to control how dense the reprojection should be
+      const int useEveryN = 4;
+      int skipCount = 0;
 
       for (yi = 0; yi < nRows; yi++) {
         p_pixel = leftDepth.ptr<float>(yi);
@@ -207,6 +254,13 @@ void Vis::start() {
           if (zi == 0) {
             continue;
           }
+
+          if (skipCount < useEveryN) {
+            skipCount++;
+            continue;
+          }
+
+          skipCount = 0;
 
           Vector4f pointImage(xi, yi, zi, 1);
           Vector4f pointCamera = m_intrinsicsInv * pointImage;

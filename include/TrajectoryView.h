@@ -83,7 +83,7 @@ public:
                         "out vec4 frag_color;\n"
                         "void main() {\n"
                         "    gl_PointSize = 1.0;\n"
-                        "    frag_color = vec4(1.0, 1.0, 1.0, 1.0);\n"
+                        "    frag_color = vec4(1.0, 1.0, 1.0, 0.35);\n"
                         "    gl_Position = projMatrix * viewMatrix * "
                         "vec4(position, 1.0);\n"
                         "}",
@@ -248,6 +248,8 @@ public:
     using namespace nanogui;
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_PROGRAM_POINT_SIZE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     float fTime = (float)glfwGetTime();
 
@@ -286,31 +288,6 @@ public:
 
     n = -10;
     f = 100;
-
-    std::cout << "Close plane: " << n << std::endl;
-    std::cout << "Far plane: " << f << std::endl;
-    std::cout << "Distance from cam to scene:"
-              << (cameraPos - sceneCenter).norm() << std::endl;
-    std::cout << "l/r:" << l << "/" << r << std::endl;
-    std::cout << "b/t:" << b << "/" << t << std::endl;
-    std::cout << "Center of Scene: " << sceneCenter << std::endl;
-    std::cout << "Mean of scene: " << sceneMean << std::endl;
-
-    /*
-    Close plane: 21.4174
-    Far plane: 40.059
-    Distance from cam to scene:30.7382
-    l/r:-9.32079/9.32079
-    b/t:-9.32079/9.32079
-    Center of Scene:
-    3.00003
-    -0.756663
-    5
-    Mean of scene:
-    1.85775
-    -0.378332
-    3.8806
-    */
 
     Matrix4f projMatrix;
     projMatrix = nanogui::ortho(l, r, b, t, n, f);
@@ -356,6 +333,7 @@ public:
     m_pointsShader.bind();
     m_pointsShader.drawArray(GL_POINTS, 0, m_points.cols());
 
+    glDisable(GL_BLEND);
     glDisable(GL_PROGRAM_POINT_SIZE);
     glDisable(GL_DEPTH_TEST);
   }
