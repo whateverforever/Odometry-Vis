@@ -196,6 +196,10 @@ void Vis::start() {
 
       std::vector<Vector3f> projectedPoints;
 
+      // Parameter to control how dense the reprojection should be
+      const int useEveryN = 4;
+      int skipCount = 0;
+
       for (yi = 0; yi < nRows; yi++) {
         p_pixel = leftDepth.ptr<float>(yi);
 
@@ -207,6 +211,13 @@ void Vis::start() {
           if (zi == 0) {
             continue;
           }
+
+          if (skipCount < useEveryN) {
+            skipCount++;
+            continue;
+          }
+
+          skipCount = 0;
 
           Vector4f pointImage(xi, yi, zi, 1);
           Vector4f pointCamera = m_intrinsicsInv * pointImage;
