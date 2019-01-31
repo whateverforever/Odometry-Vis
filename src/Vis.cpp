@@ -34,6 +34,11 @@ Vis::Vis(float fx, float fy, float f_theta, float cx, float cy) {
                     0,       fy, cy, 0,
                     0,        0,  1, 0,
                     0,        0,  0, 1;
+
+  m_intrinsicsInv << 1/fx, -f_theta/(fx*fy), -(cx*fy -cy*f_theta)/(fx*fy), 0,
+                        0,             1/fy,                       -cy/fy, 0,
+                        0,                0,                            1, 0,
+                        0,                0,                            0, 1;
   // clang-format on
   std::cout << "Set intrinsics:\n" << m_intrinsics << std::endl;
 }
@@ -170,6 +175,12 @@ void Vis::start() {
 
       odometry::Affine4f absolutePose = keyframe.GetAbsoPose();
 
+      // Swapping Y and Z to convert coordinates to a right-hand system
+      Matrix4f swapYZ;
+      swapYZ.block<3, 3>(0, 0) =
+          Eigen::AngleAxisf(-3.14 / 2, Vector3f::UnitX()).toRotationMatrix();
+      absolutePose = swapYZ * absolutePose;
+
       double min, max;
       cv::minMaxLoc(leftDepth, &min, &max);
 
@@ -198,12 +209,11 @@ void Vis::start() {
           }
 
           Vector4f pointImage(xi, yi, zi, 1);
-          Vector4f pointCamera =
-              m_intrinsics.inverse() * pointImage; // TODO: Replace inverse()
+          Vector4f pointCamera = m_intrinsicsInv * pointImage;
           Vector4f pointWorld = absolutePose * pointCamera;
 
           projectedPoints.push_back(
-              {pointWorld.x(), pointWorld.z(), pointWorld.y()});
+              {pointWorld.x(), pointWorld.y(), pointWorld.z()});
         }
       }
 

@@ -32,6 +32,7 @@ private:
   GLuint m_depthLeftTexId;
 
   nanogui::Matrix4f m_intrinsics;
+  nanogui::Matrix4f m_intrinsicsInv;
 
   std::vector<odometry::KeyFrame> m_keyframeBuffer;
   TrajectoryView *m_view;
