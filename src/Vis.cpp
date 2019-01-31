@@ -20,25 +20,38 @@ GLuint getTextureId() {
 }
 
 void bindMatToTexture(const cv::Mat &image, GLuint textureId,
-                      bool grayscale = false) {
+                      bool colorMap = false) {
   glBindTexture(GL_TEXTURE_2D, textureId);
 
   uint imageColor;
   uint dataFormat;
 
-  if (grayscale) {
-    imageColor = GL_RED;
-    dataFormat = GL_FLOAT;
+  cv::Mat tmpImage;
+  cv::Mat colorMappedImage;
 
-    GLint swizzleMask[] = {GL_RED, GL_RED, GL_RED, GL_ZERO};
-    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+  if (colorMap) {
+    double minVal, maxVal;
+
+    // Manually set min/max to fit the important data (<4m for teddy) into the
+    // 8UC1
+    minVal = 0.2;
+    maxVal = 4;
+
+    image.convertTo(tmpImage, CV_8UC1, 255 / (maxVal - minVal),
+                    -255 * minVal / (maxVal - minVal));
+
+    cv::normalize(tmpImage, tmpImage, 255, 0, cv::NORM_INF);
+    applyColorMap(tmpImage, colorMappedImage, cv::COLORMAP_PARULA);
   } else {
-    imageColor = GL_BGR;
-    dataFormat = GL_UNSIGNED_BYTE;
+    colorMappedImage = image;
   }
 
-  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, image.cols, image.rows, imageColor,
-                  dataFormat, image.ptr());
+  imageColor = GL_BGR;
+  dataFormat = GL_UNSIGNED_BYTE;
+
+  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, colorMappedImage.cols,
+                  colorMappedImage.rows, imageColor, dataFormat,
+                  colorMappedImage.ptr());
 }
 
 Vis::Vis(float fx, float fy, float f_theta, float cx, float cy) {
