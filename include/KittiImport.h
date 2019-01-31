@@ -95,7 +95,7 @@ void KittiImport::load_data(std::string filename, std::vector<cv::Mat> &gray,
       std::string item;
       std::stringstream ss(line);
 
-      while (std::getline(ss, item, ' ')) {
+      while (std::getline(ss, item, '	')) {
         items.push_back(item);
       }
 
@@ -133,7 +133,7 @@ void KittiImport::load_data(std::string filename, std::vector<cv::Mat> &gray,
       cv::Mat mask_8u = cv::imread(filename_mask, cv::IMREAD_GRAYSCALE);
 
       if (mask_8u.empty()) {
-        std::cout << "read img failed for: " << counter << std::endl;
+        std::cout << "read mask failed for: " << counter << std::endl;
         std::exit(-1);
       }
 

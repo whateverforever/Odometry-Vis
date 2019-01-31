@@ -17,17 +17,19 @@ int main(int /* argc */, char ** /* argv */) {
   float fx = 535.4, fy = 539.2, f_theta = 0, cx = 320.1, cy = 247.6;
 
   auto myUI = new Vis(fx, fy, f_theta, cx, cy);
-  auto dataGenerator = new DataGenerator();
-  auto mockCamera = new MockCameraInput();
+  // auto dataGenerator = new DataGenerator();
+  // auto mockCamera = new MockCameraInput();
+  auto kittiImporter = new KittiImport();
 
-  std::thread dataThread([mockCamera, dataGenerator, myUI]() {
+  std::thread dataThread([myUI]() {
     while (true) {
       // Getting the image from the camera, calculating the depth etc all
       // happens here dataGenerator is basically the last link in the chain:
       // Odometry auto latestKeyframe = dataGenerator->getLatestKeyframe();
-      auto latestKeyframe = mockCamera->getLatestKeyframe();
 
-      myUI->loadNewestKeyframe(latestKeyframe);
+      // auto latestKeyframe = mockCamera->getLatestKeyframe();
+
+      // myUI->loadNewestKeyframe(latestKeyframe);
 
       std::this_thread::sleep_for(std::chrono::milliseconds(300));
     }
@@ -38,8 +40,8 @@ int main(int /* argc */, char ** /* argv */) {
   dataThread.join();
 
   delete myUI;
-  delete dataGenerator;
-  delete mockCamera;
+  // delete dataGenerator;
+  // delete mockCamera;
 
   return 0;
 }
