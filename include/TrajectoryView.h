@@ -289,31 +289,6 @@ public:
     n = -10;
     f = 100;
 
-    std::cout << "Close plane: " << n << std::endl;
-    std::cout << "Far plane: " << f << std::endl;
-    std::cout << "Distance from cam to scene:"
-              << (cameraPos - sceneCenter).norm() << std::endl;
-    std::cout << "l/r:" << l << "/" << r << std::endl;
-    std::cout << "b/t:" << b << "/" << t << std::endl;
-    std::cout << "Center of Scene: " << sceneCenter << std::endl;
-    std::cout << "Mean of scene: " << sceneMean << std::endl;
-
-    /*
-    Close plane: 21.4174
-    Far plane: 40.059
-    Distance from cam to scene:30.7382
-    l/r:-9.32079/9.32079
-    b/t:-9.32079/9.32079
-    Center of Scene:
-    3.00003
-    -0.756663
-    5
-    Mean of scene:
-    1.85775
-    -0.378332
-    3.8806
-    */
-
     Matrix4f projMatrix;
     projMatrix = nanogui::ortho(l, r, b, t, n, f);
 
