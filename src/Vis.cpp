@@ -111,38 +111,38 @@ void Vis::start() {
   rgbRightView->setFixedSize({300, 200});
 
   // To test layouting...
-  auto imageWindow2 = new Window(screen, "RGB Right");
-  imageWindow2->setLayout(
+  auto viewportWindow = new Window(screen, "Viewport");
+  viewportWindow->setLayout(
       new BoxLayout(Orientation::Vertical, Alignment::Middle, 5, 5));
 
   // Display the 3d trajectory
-  auto trajectoryView = new TrajectoryView(imageWindow2);
+  auto trajectoryView = new TrajectoryView(viewportWindow);
   m_view = trajectoryView;
 
   trajectoryView->setSize({400, 400});
 
-  Button *b1 = new Button(imageWindow2, "Random Rotation");
+  Button *b1 = new Button(viewportWindow, "Random Rotation");
   b1->setCallback([trajectoryView, this]() {
     trajectoryView->setRotation(Vector3f((rand() % 100) / 100.0f,
                                          (rand() % 100) / 100.0f,
                                          (rand() % 100) / 100.0f));
   });
 
-  Button *b_zoom = new Button(imageWindow2, "Increase Zoom");
+  Button *b_zoom = new Button(viewportWindow, "Increase Zoom");
   b_zoom->setCallback([trajectoryView]() {
     auto zoom = trajectoryView->getZoom();
 
     trajectoryView->setZoom(zoom * 1.1);
   });
 
-  Button *b_zoom2 = new Button(imageWindow2, "Decrease Zoom");
+  Button *b_zoom2 = new Button(viewportWindow, "Decrease Zoom");
   b_zoom2->setCallback([trajectoryView]() {
     auto zoom = trajectoryView->getZoom();
 
     trajectoryView->setZoom(zoom * 0.9);
   });
 
-  Button *b_addPoint = new Button(imageWindow2, "Add outlier point");
+  Button *b_addPoint = new Button(viewportWindow, "Add outlier point");
   b_addPoint->setCallback([trajectoryView]() {
     auto newPoint = Vector3f(10, 0, 10);
     trajectoryView->addPoint(newPoint);
