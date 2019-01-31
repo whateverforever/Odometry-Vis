@@ -54,9 +54,11 @@ odometry::KeyFrame KittiImport::getLatestKeyframe() {
   }
 
   cv::Mat rgbRight;
-  cv::Mat rgbLeft = cv::Mat::zeros(480, 640, CV_8UC3);
+  cv::Mat rgbLeft = cv::Mat::zeros(376, 1241, CV_8UC3);
 
   // convert to rgb
+  std::cout << "gray:\n" << m_gray[m_lastFrameIdx] << std::endl;
+
   cv::cvtColor(m_gray[m_lastFrameIdx], rgbLeft, cv::COLOR_GRAY2BGR);
   rgbLeft.convertTo(rgbLeft, CV_8UC3);
 
@@ -106,11 +108,11 @@ void KittiImport::load_data(std::string filename, std::vector<cv::Mat> &gray,
       // from here on we have the pose matrix -> 15
 
       // -> load gray
-      std::string filename_rgb = std::string(DATA_PATH_KITTI + "/") + nameGray;
-      cv::Mat gray_8u = cv::imread(filename_rgb, cv::IMREAD_GRAYSCALE);
+      std::string filename_gray = std::string(DATA_PATH_KITTI + "/") + nameGray;
+      cv::Mat gray_8u = cv::imread(filename_gray, cv::IMREAD_GRAYSCALE);
 
       if (gray_8u.empty()) {
-        std::cout << "read img failed for: " << counter << filename_rgb
+        std::cout << "read img failed for: " << counter << filename_gray
                   << std::endl;
         std::exit(-1);
       }
@@ -133,14 +135,14 @@ void KittiImport::load_data(std::string filename, std::vector<cv::Mat> &gray,
 
       // -> load mask
       std::string filename_mask = std::string(DATA_PATH_KITTI + "/") + nameMask;
-      cv::Mat mask_8u = cv::imread(filename_mask, cv::IMREAD_GRAYSCALE);
+      cv::Mat mask_16u = cv::imread(filename_mask, CV_16U);
 
-      if (mask_8u.empty()) {
+      if (mask_16u.empty()) {
         std::cout << "read mask failed for: " << counter << std::endl;
         std::exit(-1);
       }
 
-      mask_8u.convertTo(gray[counter], PixelType);
+      mask_16u.convertTo(mask[counter], CV_8UC1); // one channel for binary vals
       // <-
 
       // -> pose

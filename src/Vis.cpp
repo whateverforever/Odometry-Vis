@@ -6,7 +6,8 @@ GLuint getTextureId() {
   glGenTextures(1, &imageTexId);
   glBindTexture(GL_TEXTURE_2D, imageTexId);
 
-  cv::Mat blankImgData = cv::Mat::zeros(480, 640, CV_8UC3);
+  // TODO, FIXME: Change to generic image size
+  cv::Mat blankImgData = cv::Mat::zeros(376, 1241, CV_8UC3);
 
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, blankImgData.cols, blankImgData.rows,
                0, GL_BGR, GL_UNSIGNED_BYTE, blankImgData.ptr());
