@@ -105,11 +105,12 @@ void KittiImport::load_data(std::string filename, std::vector<cv::Mat> &gray,
       // from here on we have the pose matrix -> 15
 
       // -> load gray
-      std::string filename_rgb = std::string(DATA_PATH + "/") + nameGray;
+      std::string filename_rgb = std::string(DATA_PATH_KITTI + "/") + nameGray;
       cv::Mat gray_8u = cv::imread(filename_rgb, cv::IMREAD_GRAYSCALE);
 
       if (gray_8u.empty()) {
-        std::cout << "read img failed for: " << counter << std::endl;
+        std::cout << "read img failed for: " << counter << filename_rgb
+                  << std::endl;
         std::exit(-1);
       }
 
@@ -117,7 +118,8 @@ void KittiImport::load_data(std::string filename, std::vector<cv::Mat> &gray,
       // <-
 
       // -> load depth
-      std::string filename_depth = std::string(DATA_PATH + "/") + nameDepth;
+      std::string filename_depth =
+          std::string(DATA_PATH_KITTI + "/") + nameDepth;
       cv::Mat depth_img = cv::imread(filename_depth, cv::IMREAD_UNCHANGED);
 
       if (depth_img.empty()) {
@@ -129,7 +131,7 @@ void KittiImport::load_data(std::string filename, std::vector<cv::Mat> &gray,
       // <-
 
       // -> load mask
-      std::string filename_mask = std::string(DATA_PATH + "/") + nameMask;
+      std::string filename_mask = std::string(DATA_PATH_KITTI + "/") + nameMask;
       cv::Mat mask_8u = cv::imread(filename_mask, cv::IMREAD_GRAYSCALE);
 
       if (mask_8u.empty()) {
