@@ -19,6 +19,16 @@ GLuint getTextureId() {
   return imageTexId;
 }
 
+void singleChannelToColorMap(const cv::Mat &inImg, cv::Mat &outImage,
+                             double minVal, double maxVal) {
+  cv::Mat tmpImage;
+
+  inImg.convertTo(tmpImage, CV_8UC1, 255 / (maxVal - minVal),
+                  -255 * minVal / (maxVal - minVal));
+
+  applyColorMap(tmpImage, outImage, cv::COLORMAP_PARULA);
+}
+
 void bindMatToTexture(const cv::Mat &image, GLuint textureId,
                       bool colorMap = false) {
   glBindTexture(GL_TEXTURE_2D, textureId);
@@ -30,18 +40,12 @@ void bindMatToTexture(const cv::Mat &image, GLuint textureId,
   cv::Mat colorMappedImage;
 
   if (colorMap) {
-    double minVal, maxVal;
-
     // Manually set min/max to fit the important data (<4m for teddy) into the
     // 8UC1
-    minVal = 0.2;
-    maxVal = 4;
+    double minVal = 0.2;
+    double maxVal = 4;
 
-    image.convertTo(tmpImage, CV_8UC1, 255 / (maxVal - minVal),
-                    -255 * minVal / (maxVal - minVal));
-
-    cv::normalize(tmpImage, tmpImage, 255, 0, cv::NORM_INF);
-    applyColorMap(tmpImage, colorMappedImage, cv::COLORMAP_PARULA);
+    singleChannelToColorMap(image, colorMappedImage, minVal, maxVal);
   } else {
     colorMappedImage = image;
   }
@@ -227,6 +231,8 @@ void Vis::start() {
 
       cv::Mat leftDepth = keyframe.GetLeftDep(); // 32FC1, min/max:0/9.87
       cv::Mat leftValue = keyframe.GetLeftVal();
+
+      // leftDepth
 
       bindMatToTexture(leftDepth, m_depthLeftTexId, true);
 
