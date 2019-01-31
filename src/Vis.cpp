@@ -131,7 +131,6 @@ void Vis::start() {
   // Reserve some Textures for later images
   m_rgbLeftTexId = getTextureId();
   m_rgbRightTexId = getTextureId();
-  m_depthLeftTexId = getTextureId();
 
   /* Left Window with Camera Images */
 
@@ -153,19 +152,6 @@ void Vis::start() {
   rgbRightView->setFixedSize({400, 300});
   rgbRightView->setSize(rgbRightView->fixedSize());
   rgbRightView->fit();
-
-  Widget *secondRow = new Widget(rgbImageWindow);
-  secondRow->setLayout(
-      new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 6));
-
-  auto depthView = new ImageView(secondRow, m_depthLeftTexId);
-  depthView->setFixedSize({400, 300});
-  depthView->setSize(depthView->fixedSize());
-  depthView->fit();
-  auto overlayedView = new ImageView(secondRow, m_rgbRightTexId);
-  overlayedView->setFixedSize({400, 300});
-  overlayedView->setSize(overlayedView->fixedSize());
-  overlayedView->fit();
 
   // To test layouting...
   auto viewportWindow = new Window(screen, "Viewport");
@@ -233,7 +219,6 @@ void Vis::start() {
 
       depthColored.copyTo(leftRGB, leftValue);
 
-      bindMatToTexture(leftDepth, m_depthLeftTexId, true);
       bindMatToTexture(leftRGB, m_rgbLeftTexId);
       bindMatToTexture(rightRGB, m_rgbRightTexId);
 
