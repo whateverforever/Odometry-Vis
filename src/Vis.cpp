@@ -91,24 +91,34 @@ void Vis::start() {
   using namespace nanogui;
 
   nanogui::init();
-  auto screen = new VisScreen({1000, 750}, "NanoGUI test");
+  VisScreen *screen = new VisScreen({1280, 720}, "NanoGUI test");
   screen->setLayout(
       new BoxLayout(Orientation::Horizontal, Alignment::Middle, 10, 10));
 
   auto rgbImageWindow = new Window(screen, "RGB");
   rgbImageWindow->setLayout(
-      new BoxLayout(Orientation::Horizontal, Alignment::Middle, 5, 5));
+      new BoxLayout(Orientation::Vertical, Alignment::Middle, 5, 5));
+
+  Widget *firstRow = new Widget(rgbImageWindow);
+  firstRow->setLayout(
+      new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 6));
 
   // Reserve some Textures for later images
   m_rgbLeftTexId = getTextureId();
   m_rgbRightTexId = getTextureId();
   m_depthLeftTexId = getTextureId();
 
-  auto rgbLeftView = new ImageView(rgbImageWindow, m_rgbLeftTexId);
+  auto rgbLeftView = new ImageView(firstRow, m_rgbLeftTexId);
   rgbLeftView->setFixedSize({300, 200});
-
-  auto rgbRightView = new ImageView(rgbImageWindow, m_rgbRightTexId);
+  auto rgbRightView = new ImageView(firstRow, m_rgbRightTexId);
   rgbRightView->setFixedSize({300, 200});
+
+  Widget *secondRow = new Widget(rgbImageWindow);
+  secondRow->setLayout(
+      new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 6));
+
+  auto depthView = new ImageView(secondRow, m_depthLeftTexId);
+  depthView->setFixedSize({300, 200});
 
   // To test layouting...
   auto viewportWindow = new Window(screen, "Viewport");
