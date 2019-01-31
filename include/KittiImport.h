@@ -129,7 +129,10 @@ void KittiImport::load_data(std::string filename, std::vector<cv::Mat> &gray,
         std::exit(-1);
       }
 
-      depth_img.convertTo(depth[counter], PixelType, 1.0f / 386.1448f);
+      depth_img.convertTo(depth[counter], PixelType, 1.0f);
+      // To go from disparity to depth
+      depth[counter] /= 1;
+      depth[counter] * 386.1448f;
 
       cv::namedWindow("depth", cv::WINDOW_NORMAL);
       cv::imshow("depth", depth[counter]);
@@ -145,7 +148,11 @@ void KittiImport::load_data(std::string filename, std::vector<cv::Mat> &gray,
         std::exit(-1);
       }
 
-      mask_16u.convertTo(mask[counter], CV_8UC1); // one channel for binary vals
+      cv::Mat mask_8uc1;
+
+      mask_16u.convertTo(mask_8uc1, CV_8UC1); // one channel for binary vals
+      mask_8uc1.convertTo(mask[counter], cv::IMREAD_GRAYSCALE, 125);
+
       cv::namedWindow("mask", cv::WINDOW_NORMAL);
       cv::imshow("mask", mask[counter]);
       cv::waitKey(0);

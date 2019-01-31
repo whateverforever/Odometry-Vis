@@ -43,16 +43,27 @@ void bindMatToTexture(const cv::Mat &image, GLuint textureId,
   if (colorMap) {
     // Manually set min/max to fit the important data (<4m for teddy) into the
     // 8UC1
-    double minVal = 0.2;
-    double maxVal = 4;
+    // double minVal = 0.2;
+    // double maxVal = 4;
 
-    singleChannelToColorMap(image, colorMappedImage, minVal, maxVal);
+    double minVal, maxVal;
+    cv::minMaxLoc(image, &minVal, &maxVal);
+
+    // singleChannelToColorMap(image, colorMappedImage, minVal, maxVal);
+
+    imageColor = GL_RED;
+    dataFormat = GL_FLOAT;
+
+    colorMappedImage = image;
+    // GLint swizzleMask[] = {GL_RED, GL_RED, GL_RED, GL_ZERO};
+    // glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+
   } else {
+    imageColor = GL_BGR;
+    dataFormat = GL_UNSIGNED_BYTE;
+
     colorMappedImage = image;
   }
-
-  imageColor = GL_BGR;
-  dataFormat = GL_UNSIGNED_BYTE;
 
   glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, colorMappedImage.cols,
                   colorMappedImage.rows, imageColor, dataFormat,
@@ -234,6 +245,14 @@ void Vis::start() {
       // absolutePose = swapYZ * absolutePose; // TODO: remove, commented out
       // for kitti
 
+      Matrix3f rot = absolutePose.block<3, 3>(0, 0);
+      Vector3f tra = absolutePose.block<3, 1>(0, 3);
+
+      Matrix4f poseInv;
+      poseInv.block<3, 3>(0, 0) = rot.transpose();
+      poseInv.block<3, 1>(0, 3) = -rot.transpose() * tra;
+      poseInv(3, 3) = 1;
+
       int nChannels = leftDepth.channels();
       int nRows = leftDepth.rows;
       int nCols = leftDepth.cols * nChannels;
@@ -244,7 +263,7 @@ void Vis::start() {
       std::vector<Vector3f> projectedPoints;
 
       // Parameter to control how dense the reprojection should be
-      const int useEveryN = 4;
+      const int useEveryN = 0;
       int skipCount = 0;
 
       for (yi = 0; yi < nRows; yi++) {
