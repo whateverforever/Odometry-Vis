@@ -225,16 +225,17 @@ void Vis::start() {
     for (odometry::KeyFrame &keyframe : m_keyframeBuffer) {
       cv::Mat leftRGB = keyframe.GetLeftImg();
       cv::Mat rightRGB = keyframe.GetRightImg();
-
-      bindMatToTexture(leftRGB, m_rgbLeftTexId);
-      bindMatToTexture(rightRGB, m_rgbRightTexId);
-
       cv::Mat leftDepth = keyframe.GetLeftDep(); // 32FC1, min/max:0/9.87
-      cv::Mat leftValue = keyframe.GetLeftVal();
+      cv::Mat leftValue = keyframe.GetLeftVal(); // 8UC1, mask for depth
 
-      // leftDepth
+      cv::Mat depthColored;
+      singleChannelToColorMap(leftDepth, depthColored, 0.2, 4.0);
+
+      depthColored.copyTo(leftRGB, leftValue);
 
       bindMatToTexture(leftDepth, m_depthLeftTexId, true);
+      bindMatToTexture(leftRGB, m_rgbLeftTexId);
+      bindMatToTexture(rightRGB, m_rgbRightTexId);
 
       odometry::Affine4f absolutePose = keyframe.GetAbsoPose();
 

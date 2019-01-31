@@ -14,13 +14,17 @@ odometry::KeyFrame MockCameraInput::getLatestKeyframe() {
     m_lastFrameIdx = 0;
   }
 
-  cv::Mat rgbImage = cv::Mat::zeros(480, 640, CV_8UC3);
+  cv::Mat rgbRight;
+  cv::Mat rgbLeft = cv::Mat::zeros(480, 640, CV_8UC3);
 
   // convert to rgb
-  cv::cvtColor(m_gray[m_lastFrameIdx], rgbImage, cv::COLOR_GRAY2BGR);
-  rgbImage.convertTo(rgbImage, CV_8UC3);
+  cv::cvtColor(m_gray[m_lastFrameIdx], rgbLeft, cv::COLOR_GRAY2BGR);
+  rgbLeft.convertTo(rgbLeft, CV_8UC3);
 
-  auto p_leftRGB = std::make_shared<cv::Mat>(rgbImage);
+  rgbLeft.copyTo(rgbRight);
+
+  auto p_leftRGB = std::make_shared<cv::Mat>(rgbLeft);
+  auto p_rightRGB = std::make_shared<cv::Mat>(rgbRight);
   auto p_leftDepth = std::make_shared<cv::Mat>(m_depth[m_lastFrameIdx]);
 
   Eigen::VectorXf pose_raw = m_poses.col(m_lastFrameIdx);
@@ -34,12 +38,12 @@ odometry::KeyFrame MockCameraInput::getLatestKeyframe() {
 
   m_lastFrameIdx += 1;
 
-  cv::Mat depthMask(rgbImage.size(), CV_8UC1);
+  cv::Mat depthMask(rgbLeft.size(), CV_8UC1);
   cv::randu(depthMask, 0, 2);
 
   auto p_depthMask = std::make_shared<cv::Mat>(depthMask);
 
-  return odometry::KeyFrame(p_leftRGB, p_leftRGB, p_leftDepth, p_depthMask,
+  return odometry::KeyFrame(p_leftRGB, p_rightRGB, p_leftDepth, p_depthMask,
                             pose);
 }
 
