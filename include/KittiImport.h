@@ -34,14 +34,15 @@ private:
   Eigen::MatrixXf m_poses;
   std::vector<cv::Mat> m_gray;
   std::vector<cv::Mat> m_depth;
+  std::vector<cv::Mat> m_mask;
 };
 
 KittiImport::KittiImport()
     : m_poses(7, N_FRAMES), m_gray(N_FRAMES), m_depth(N_FRAMES) {
 
   m_lastFrameIdx = 0;
-  load_data(DATA_PATH_KITTI + "/associated.txt", m_gray, m_depth, m_poses,
-            N_FRAMES);
+  load_data(DATA_PATH_KITTI + "/associated.txt", m_gray, m_depth, m_mask,
+            m_poses, N_FRAMES);
 
   std::cout << "Load data done: " << N_FRAMES << " frames" << std::endl;
 }
@@ -85,7 +86,8 @@ odometry::KeyFrame KittiImport::getLatestKeyframe() {
 }
 
 void KittiImport::load_data(std::string filename, std::vector<cv::Mat> &gray,
-                            std::vector<cv::Mat> &depth, Eigen::MatrixXf &poses,
+                            std::vector<cv::Mat> &depth,
+                            std::vector<cv::Mat> &mask, Eigen::MatrixXf &poses,
                             int n_frames) {
   std::string line;
   std::ifstream file(filename);
@@ -128,6 +130,19 @@ void KittiImport::load_data(std::string filename, std::vector<cv::Mat> &gray,
       }
 
       depth_img.convertTo(depth[counter], PixelType, 1.0f / 5000.0f);
+      // <-
+
+      // -> load mask
+      std::string filename_mask = std::string(DATA_PATH + "/") + nameMask;
+      cv::Mat mask_8u = cv::imread(filename_mask, cv::IMREAD_GRAYSCALE);
+
+      if (mask_8u.empty()) {
+        std::cout << "read img failed for: " << counter << std::endl;
+        std::exit(-1);
+      }
+
+      mask_8u.convertTo(gray[counter], PixelType);
+      // <-
 
       // -> pose
       // clang-format off
@@ -143,6 +158,10 @@ void KittiImport::load_data(std::string filename, std::vector<cv::Mat> &gray,
                      std::stof(items[12]), std::stof(items[13]), std::stof(items[14]);
       // clang-format on
 
+      Eigen::Quaternionf q(rotationMat);
+
+      // wxyz
+
       // Eigen::Quaternionf q(std::stof(items[7]), std::stof(items[4]),
       // std::stof(items[5]), std::stof(items[6])); // <- rotation in Eigen:
       // w,x,y,z Eigen::Vector3f a =
@@ -150,11 +169,13 @@ void KittiImport::load_data(std::string filename, std::vector<cv::Mat> &gray,
       // convert to axis angle
 
       // clang-format off
-      poses.col(counter) << std::stof(items[7]),
-                            std::stof(items[4]),
-                            std::stof(items[5]),
-                            std::stof(items[6]),
-                            t(0), t(1), t(2);
+      poses.col(counter) << q.w,
+                            q.x,
+                            q.y,
+                            q.z,
+                            t(0),
+                            t(1),
+                            t(2);
       // clang-format on
 
       counter++;
