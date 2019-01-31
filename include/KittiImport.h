@@ -18,7 +18,7 @@
 #include <data_types.h>
 
 #ifndef N_FRAMES
-#define N_FRAMES 32 // 200
+#define N_FRAMES 23
 #endif
 
 class KittiImport {
@@ -101,8 +101,13 @@ void KittiImport::load_data(std::string filename, std::vector<cv::Mat> &gray,
         items.push_back(item);
       }
 
+      std::string nameDepth = items[1];
+      std::string nameGray = items[2];
+      std::string nameMask = items[3];
+      // from here on we have the pose matrix -> 15
+
       // -> load gray
-      std::string filename_rgb = std::string(DATA_PATH + "/") + items[9];
+      std::string filename_rgb = std::string(DATA_PATH + "/") + nameGray;
       cv::Mat gray_8u = cv::imread(filename_rgb, cv::IMREAD_GRAYSCALE);
 
       if (gray_8u.empty()) {
@@ -114,7 +119,7 @@ void KittiImport::load_data(std::string filename, std::vector<cv::Mat> &gray,
       // <-
 
       // -> load depth
-      std::string filename_depth = std::string(DATA_PATH + "/") + items[11];
+      std::string filename_depth = std::string(DATA_PATH + "/") + nameDepth;
       cv::Mat depth_img = cv::imread(filename_depth, cv::IMREAD_UNCHANGED);
 
       if (depth_img.empty()) {
@@ -125,8 +130,19 @@ void KittiImport::load_data(std::string filename, std::vector<cv::Mat> &gray,
       depth_img.convertTo(depth[counter], PixelType, 1.0f / 5000.0f);
 
       // -> pose
-      Eigen::Vector3f t(std::stof(items[1]), std::stof(items[2]),
-                        std::stof(items[3])); // <- translation T
+      // clang-format off
+      Eigen::Vector3f t(
+        std::stof(items[7]),
+        std::stof(items[11]),
+        std::stof(items[15])
+      ); // <- translation T
+
+      Eigen::Matrix3f rotationMat;
+      rotationMat << std::stof(items[4]), std::stof(items[5]), std::stof(items[6]),
+                     std::stof(items[8]), std::stof(items[9]), std::stof(items[10]),
+                     std::stof(items[12]), std::stof(items[13]), std::stof(items[14]);
+      // clang-format on
+
       // Eigen::Quaternionf q(std::stof(items[7]), std::stof(items[4]),
       // std::stof(items[5]), std::stof(items[6])); // <- rotation in Eigen:
       // w,x,y,z Eigen::Vector3f a =
