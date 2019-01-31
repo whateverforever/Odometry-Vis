@@ -19,10 +19,19 @@ GLuint getTextureId() {
   return imageTexId;
 }
 
-void bindMatToTexture(const cv::Mat &image, GLuint textureId) {
+void bindMatToTexture(const cv::Mat &image, GLuint textureId,
+                      bool grayscale = false) {
   glBindTexture(GL_TEXTURE_2D, textureId);
-  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, image.cols, image.rows, GL_BGR,
-                  GL_UNSIGNED_BYTE, image.ptr());
+
+  if (grayscale) {
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, image.cols, image.rows, GL_RED,
+                    GL_FLOAT, image.ptr());
+    GLint swizzleMask[] = {GL_RED, GL_RED, GL_RED, GL_ZERO};
+    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+  } else {
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, image.cols, image.rows, GL_BGR,
+                    GL_UNSIGNED_BYTE, image.ptr());
+  }
 }
 
 Vis::Vis(float fx, float fy, float f_theta, float cx, float cy) {
@@ -186,6 +195,8 @@ void Vis::start() {
     m_numElapsedFrames += 1;
     /******** </FPS> ********/
 
+    std::cout << "Going to draw " << m_keyframeBuffer.size() << " keyframes.."
+              << std::endl;
     // Draw buffered keyframes
     for (odometry::KeyFrame &keyframe : m_keyframeBuffer) {
       cv::Mat leftRGB = keyframe.GetLeftImg();
@@ -197,6 +208,8 @@ void Vis::start() {
       cv::Mat leftDepth = keyframe.GetLeftDep(); // 32FC1, min/max:0/9.87
       cv::Mat leftValue = keyframe.GetLeftVal();
 
+      bindMatToTexture(leftDepth, m_depthLeftTexId, true);
+
       odometry::Affine4f absolutePose = keyframe.GetAbsoPose();
 
       // Swapping Y and Z to convert coordinates to a right-hand system
@@ -204,12 +217,6 @@ void Vis::start() {
       swapYZ.block<3, 3>(0, 0) =
           Eigen::AngleAxisf(-3.14 / 2, Vector3f::UnitX()).toRotationMatrix();
       absolutePose = swapYZ * absolutePose;
-
-      double min, max;
-      cv::minMaxLoc(leftDepth, &min, &max);
-
-      std::cout << "Depth Min/Max:" << min << "/" << max << std::endl;
-      std::cout << "Depth Format:" << type2str(leftDepth.type()) << std::endl;
 
       int nChannels = leftDepth.channels();
       int nRows = leftDepth.rows;
