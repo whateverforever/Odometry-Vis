@@ -111,18 +111,28 @@ void Vis::start() {
       new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 6));
 
   auto rgbLeftView = new ImageView(firstRow, m_rgbLeftTexId);
-  rgbLeftView->setFixedSize({300, 200});
+  rgbLeftView->setFixedSize({400, 300});
+  // Weird nanogui behaviour, see
+  // https://nanogui.readthedocs.io/en/latest/api/class_nanogui__Widget.html?highlight=widget#_CPPv2N7nanogui6Widget12setFixedSizeERK8Vector2i
+  rgbLeftView->setSize(rgbLeftView->fixedSize());
+  rgbLeftView->fit();
   auto rgbRightView = new ImageView(firstRow, m_rgbRightTexId);
-  rgbRightView->setFixedSize({300, 200});
+  rgbRightView->setFixedSize({400, 300});
+  rgbRightView->setSize(rgbRightView->fixedSize());
+  rgbRightView->fit();
 
   Widget *secondRow = new Widget(rgbImageWindow);
   secondRow->setLayout(
       new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 6));
 
   auto depthView = new ImageView(secondRow, m_depthLeftTexId);
-  depthView->setFixedSize({300, 200});
+  depthView->setFixedSize({400, 300});
+  depthView->setSize(depthView->fixedSize());
+  depthView->fit();
   auto overlayedView = new ImageView(secondRow, m_rgbRightTexId);
-  overlayedView->setFixedSize({300, 200});
+  overlayedView->setFixedSize({400, 300});
+  overlayedView->setSize(overlayedView->fixedSize());
+  overlayedView->fit();
 
   // To test layouting...
   auto viewportWindow = new Window(screen, "Viewport");
