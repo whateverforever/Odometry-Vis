@@ -83,7 +83,7 @@ public:
                         "out vec4 frag_color;\n"
                         "void main() {\n"
                         "    gl_PointSize = 1.0;\n"
-                        "    frag_color = vec4(1.0, 1.0, 1.0, 1.0);\n"
+                        "    frag_color = vec4(1.0, 1.0, 1.0, 0.35);\n"
                         "    gl_Position = projMatrix * viewMatrix * "
                         "vec4(position, 1.0);\n"
                         "}",
@@ -248,6 +248,8 @@ public:
     using namespace nanogui;
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_PROGRAM_POINT_SIZE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     float fTime = (float)glfwGetTime();
 
@@ -356,6 +358,7 @@ public:
     m_pointsShader.bind();
     m_pointsShader.drawArray(GL_POINTS, 0, m_points.cols());
 
+    glDisable(GL_BLEND);
     glDisable(GL_PROGRAM_POINT_SIZE);
     glDisable(GL_DEPTH_TEST);
   }
