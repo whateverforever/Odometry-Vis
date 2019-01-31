@@ -28,7 +28,7 @@ public:
 
 private:
   void load_data(std::string, std::vector<cv::Mat> &, std::vector<cv::Mat> &,
-                 Eigen::MatrixXf &, int);
+                 std::vector<cv::Mat> &, Eigen::MatrixXf &, int);
 
   int m_lastFrameIdx;
   Eigen::MatrixXf m_poses;
@@ -64,6 +64,7 @@ odometry::KeyFrame KittiImport::getLatestKeyframe() {
   auto p_leftRGB = std::make_shared<cv::Mat>(rgbLeft);
   auto p_rightRGB = std::make_shared<cv::Mat>(rgbRight);
   auto p_leftDepth = std::make_shared<cv::Mat>(m_depth[m_lastFrameIdx]);
+  auto p_depthMask = std::make_shared<cv::Mat>(m_mask[m_lastFrameIdx]);
 
   Eigen::VectorXf pose_raw = m_poses.col(m_lastFrameIdx);
   Eigen::Quaternionf pose_quat(pose_raw[0], pose_raw[1], pose_raw[2],
@@ -75,11 +76,6 @@ odometry::KeyFrame KittiImport::getLatestKeyframe() {
   pose.block<3, 1>(0, 3) = pose_translation;
 
   m_lastFrameIdx += 1;
-
-  cv::Mat depthMask(rgbLeft.size(), CV_8UC1);
-  cv::randu(depthMask, 0, 2);
-
-  auto p_depthMask = std::make_shared<cv::Mat>(depthMask);
 
   return odometry::KeyFrame(p_leftRGB, p_rightRGB, p_leftDepth, p_depthMask,
                             pose);
@@ -169,10 +165,10 @@ void KittiImport::load_data(std::string filename, std::vector<cv::Mat> &gray,
       // convert to axis angle
 
       // clang-format off
-      poses.col(counter) << q.w,
-                            q.x,
-                            q.y,
-                            q.z,
+      poses.col(counter) << q.w(),
+                            q.x(),
+                            q.y(),
+                            q.z(),
                             t(0),
                             t(1),
                             t(2);

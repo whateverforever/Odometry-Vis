@@ -8,6 +8,7 @@
 #include <opencv2/opencv.hpp>
 
 #include <DataGen.h>
+#include <KittiImport.h>
 #include <MockCameraInput.h>
 #include <Vis.h>
 
